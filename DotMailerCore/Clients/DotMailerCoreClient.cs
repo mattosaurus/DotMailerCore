@@ -15,8 +15,8 @@ namespace DotMailerCore
 {
     public class DotMailerCoreClient : BaseClient, IDotMailerCoreClient
     {
-        public DotMailerCoreClient(ICacheService cache, IDeserializer serializer, ILoggerFactory loggerFactory, IOptions<DotMailerCoreOptions> options)
-            : base(cache, serializer, loggerFactory, options.Value.BaseUrl, options.Value.Authenticator) { }
+        public DotMailerCoreClient(ICacheService cache, IDeserializer serializer, IOptions<DotMailerCoreOptions> options)
+            : base(options.Value.BaseUrl, cache, serializer, options.Value.Authenticator) { }
 
         public DotMailerCoreClient(IOptions<DotMailerCoreOptions> options)
             : base(options.Value.BaseUrl, options.Value.Authenticator) { }
@@ -74,7 +74,8 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<AddressBook> UpdateAddressBookAsync(AddressBook addressBook)
         {
-            var request = new RestRequest("/address-books/{addressBook.Id}", Method.PUT);
+            var request = new RestRequest("/address-books/{id}", Method.PUT);
+            request.AddParameter("id", addressBook.Id, ParameterType.UrlSegment);
             request.AddJsonBody(addressBook);
 
             return await MakeRequestAsync<AddressBook>(request);
@@ -88,6 +89,7 @@ namespace DotMailerCore
         public async Task<AddressBook> GetAddressBookAsync(int id)
         {
             var request = new RestRequest("/address-books/{id}");
+            request.AddParameter("id", id, ParameterType.UrlSegment);
 
             return await MakeRequestAsync<AddressBook>(request);
         }
@@ -98,7 +100,7 @@ namespace DotMailerCore
         /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
         /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
         /// <returns></returns>
-        public async Task<List<AddressBook>> GetAddressBooksAsync(int select, int skip)
+        public async Task<List<AddressBook>> GetAddressBooksAsync(int select = 1000, int skip = 0)
         {
             var request = new RestRequest("/address-books/");
             request.AddParameter("select", select, ParameterType.QueryString);
@@ -113,7 +115,7 @@ namespace DotMailerCore
         /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
         /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
         /// <returns></returns>
-        public async Task<List<AddressBook>> GetPrivateAddressBooksAsync(int select, int skip)
+        public async Task<List<AddressBook>> GetPrivateAddressBooksAsync(int select = 1000, int skip = 0)
         {
             var request = new RestRequest("/address-books/private");
             request.AddParameter("select", select, ParameterType.QueryString);
@@ -128,13 +130,146 @@ namespace DotMailerCore
         /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
         /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
         /// <returns></returns>
-        public async Task<List<AddressBook>> GetPublicAddressBooksAsync(int select, int skip)
+        public async Task<List<AddressBook>> GetPublicAddressBooksAsync(int select = 1000, int skip = 0)
         {
             var request = new RestRequest("/address-books/public");
             request.AddParameter("select", select, ParameterType.QueryString);
             request.AddParameter("skip", skip, ParameterType.QueryString);
 
             return await MakeRequestAsync<List<AddressBook>>(request);
+        }
+
+        #endregion
+
+        #region Campaigns
+
+        /// <summary>
+        /// Creates a campaign.
+        /// </summary>
+        /// <param name="campaign"></param>
+        /// <returns></returns>
+        public async Task<Campaign> CreateCampaignAsync(Campaign campaign)
+        {
+            var request = new RestRequest("/campaigns", Method.POST);
+            request.AddJsonBody(campaign);
+
+            return await MakeRequestAsync<Campaign>(request);
+        }
+
+        /// <summary>
+        /// Creates a split test campaign.
+        /// </summary>
+        /// <param name="splitTestCampaign"></param>
+        /// <returns></returns>
+        public async Task<SplitTestCampaign> CreateSplitTestCampaignAsync(SplitTestCampaign splitTestCampaign)
+        {
+            var request = new RestRequest("/campaigns/split-test", Method.POST);
+            request.AddJsonBody(splitTestCampaign);
+
+            return await MakeRequestAsync<SplitTestCampaign>(request);
+        }
+
+        /// <summary>
+        /// Updates a given campaign.
+        /// </summary>
+        /// <param name="campaign"></param>
+        /// <returns></returns>
+        public async Task<Campaign> UpdateCampaignAsync(Campaign campaign)
+        {
+            var request = new RestRequest("/campaigns/{id}", Method.PUT);
+            request.AddParameter("id", campaign.Id, ParameterType.UrlSegment);
+            request.AddJsonBody(campaign);
+
+            return await MakeRequestAsync<Campaign>(request);
+        }
+
+        /// <summary>
+        /// Copies a given campaign, returning the new campaign.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<Campaign> CopyCampaignAsync(int id)
+        {
+            var request = new RestRequest("/campaigns/{id}/copy", Method.POST);
+            request.AddParameter("id", id, ParameterType.UrlSegment);
+
+            return await MakeRequestAsync<Campaign>(request);
+        }
+
+        /// <summary>
+        /// Deletes a campaign.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task DeleteCampaignAsync(int id)
+        {
+            var request = new RestRequest("/campaigns/{id}", Method.DELETE);
+            request.AddParameter("id", id, ParameterType.UrlSegment);
+
+            await MakeRequestAsync(request);
+        }
+
+        /// <summary>
+        /// Sends a specified campaign to one or more address books, segments or contacts, either as an immediate or scheduled send.
+        /// </summary>
+        /// <param name="campaignSend"></param>
+        /// <returns></returns>
+        public async Task<CampaignSend> SendCampaignAsync(CampaignSend campaignSend)
+        {
+            var request = new RestRequest("/campaigns/send", Method.POST);
+            request.AddJsonBody(campaignSend);
+
+            return await MakeRequestAsync<CampaignSend>(request);
+        }
+
+        /// <summary>
+        /// Sends a specified campaign to one or more address books, segments or contacts at the most appropriate time based upon their previous opens.
+        /// </summary>
+        /// <param name="campaignSend"></param>
+        /// <returns></returns>
+        public async Task<CampaignSend> SendTimeOptimisedCampaignAsync(CampaignSend campaignSend)
+        {
+            var request = new RestRequest("/campaigns/send-time-optimised", Method.POST);
+            request.AddJsonBody(campaignSend);
+
+            return await MakeRequestAsync<CampaignSend>(request);
+        }
+
+        /// <summary>
+        /// Gets a campaign send status using send ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<CampaignSend> GetCampaignSendStatusAsync(Guid id)
+        {
+            var request = new RestRequest("/campaigns/send/{id}");
+            request.AddParameter("id", id, ParameterType.UrlSegment);
+
+            return await MakeRequestAsync<CampaignSend>(request);
+        }
+
+        /// <summary>
+        /// Adds a document to a campaign as an attachment.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="attatchment"></param>
+        /// <returns></returns>
+        public async Task<Attatchment> AddCampaignAttachmentAsync(int id, Attatchment attatchment)
+        {
+            var request = new RestRequest("/campaigns/{id}/attachments", Method.POST);
+            request.AddParameter("id", id, ParameterType.UrlSegment);
+            request.AddJsonBody(attatchment);
+
+            return await MakeRequestAsync<Attatchment>(request);
+        }
+
+        public async Task RemoveCampaignAttachmentAsync(int campaignId, int documentId)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/attachments/{documentId}", Method.DELETE);
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("documentId", documentId, ParameterType.UrlSegment);
+
+            await MakeRequestAsync(request);
         }
 
         #endregion

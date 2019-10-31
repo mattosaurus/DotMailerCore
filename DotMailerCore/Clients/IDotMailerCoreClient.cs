@@ -25,5 +25,25 @@ namespace DotMailerCore.Clients
         Task<List<AddressBook>> GetPrivateAddressBooksAsync(int select, int skip);
 
         Task<List<AddressBook>> GetPublicAddressBooksAsync(int select, int skip);
+
+        Task<Campaign> CreateCampaignAsync(Campaign campaign);
+
+        Task<SplitTestCampaign> CreateSplitTestCampaignAsync(SplitTestCampaign splitTestCampaign);
+
+        Task<Campaign> UpdateCampaignAsync(Campaign campaign);
+
+        Task<Campaign> CopyCampaignAsync(int id);
+
+        Task DeleteCampaignAsync(int id);
+
+        Task<CampaignSend> SendCampaignAsync(CampaignSend campaignSend);
+
+        Task<CampaignSend> SendTimeOptimisedCampaignAsync(CampaignSend campaignSend);
+
+        Task<CampaignSend> GetCampaignSendStatusAsync(Guid id);
+
+        Task<Attatchment> AddCampaignAttachmentAsync(int id, Attatchment attatchment);
+
+        Task RemoveCampaignAttachmentAsync(int campaignId, int documentId);
     }
 }

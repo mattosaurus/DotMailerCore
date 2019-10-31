@@ -14,12 +14,10 @@ namespace ApiBaseClient
     public class BaseClient : RestSharp.RestClient, IBaseClient
     {
         protected ICacheService _cache;
-        private readonly ILogger _logger;
 
-        public BaseClient(ICacheService cache, IDeserializer serializer, ILoggerFactory loggerFactory, string baseUrl, IAuthenticator authenticator)
+        public BaseClient(string baseUrl, ICacheService cache, IDeserializer serializer, IAuthenticator authenticator)
         {
             _cache = cache;
-            _logger = loggerFactory.CreateLogger("BaseClient");
             AddHandler("application/json", () => serializer);
             AddHandler("text/json", () => serializer);
             AddHandler("text/x-json", () => serializer);
@@ -27,10 +25,9 @@ namespace ApiBaseClient
             Authenticator = authenticator;
         }
 
-        public BaseClient(ICacheService cache, IDeserializer serializer, ILoggerFactory loggerFactory, string baseUrl)
+        public BaseClient(string baseUrl, ICacheService cache, IDeserializer serializer)
         {
             _cache = cache;
-            _logger = loggerFactory.CreateLogger("BaseClient");
             AddHandler("application/json", () => serializer);
             AddHandler("text/json", () => serializer);
             AddHandler("text/x-json", () => serializer);
@@ -39,12 +36,8 @@ namespace ApiBaseClient
 
         public BaseClient(string baseUrl, IAuthenticator authenticator)
         {
-            InMemoryCache inMemoryCache = new InMemoryCache();
             JsonSerializer jsonSerializer = new JsonSerializer();
-            LoggerFactory loggerFactory = new LoggerFactory();
 
-            _cache = new InMemoryCache();
-            _logger = loggerFactory.CreateLogger<BaseClient>();
             AddHandler("application/json", () => jsonSerializer);
             AddHandler("text/json", () => jsonSerializer);
             AddHandler("text/x-json", () => jsonSerializer);
@@ -54,19 +47,15 @@ namespace ApiBaseClient
 
         public BaseClient(string baseUrl)
         {
-            InMemoryCache inMemoryCache = new InMemoryCache();
             JsonSerializer jsonSerializer = new JsonSerializer();
-            LoggerFactory loggerFactory = new LoggerFactory();
 
-            _cache = new InMemoryCache();
-            _logger = loggerFactory.CreateLogger<BaseClient>();
             AddHandler("application/json", () => jsonSerializer);
             AddHandler("text/json", () => jsonSerializer);
             AddHandler("text/x-json", () => jsonSerializer);
             BaseUrl = new Uri(baseUrl);
         }
 
-        private void LogError(Uri BaseUrl, IRestRequest request, IRestResponse response)
+        private void ThrowException(Uri BaseUrl, IRestRequest request, IRestResponse response)
         {
             //Get the values of the parameters passed to the API
             string parameters = string.Join(", ", request.Parameters.Select(x => x.Name.ToString() + "=" + ((x.Value == null) ? "NULL" : x.Value)).ToArray());
@@ -87,15 +76,19 @@ namespace ApiBaseClient
                 info = string.Empty;
             }
 
-            //Log the exception and info message
-            _logger.LogError(ex, info);
+            throw new ApiException(
+                (int)response.StatusCode,
+                ex.Message,
+                info,
+                ex
+                );
         }
 
         private bool TimeoutCheck(IRestRequest request, IRestResponse response)
         {
             if (response.StatusCode == 0)
             {
-                LogError(BaseUrl, request, response);
+                ThrowException(BaseUrl, request, response);
                 return true;
             }
             else
@@ -142,7 +135,7 @@ namespace ApiBaseClient
             }
             else
             {
-                LogError(BaseUrl, request, response);
+                ThrowException(BaseUrl, request, response);
                 return default(T);
             }
         }
@@ -152,7 +145,7 @@ namespace ApiBaseClient
             var response = Execute(request);
             if (!response.IsSuccessful)
             {
-                LogError(BaseUrl, request, response);
+                ThrowException(BaseUrl, request, response);
             }
         }
 
@@ -165,7 +158,7 @@ namespace ApiBaseClient
             }
             else
             {
-                LogError(BaseUrl, request, response);
+                ThrowException(BaseUrl, request, response);
                 return default(T);
             }
         }
@@ -175,7 +168,7 @@ namespace ApiBaseClient
             var response = await ExecuteTaskAsync(request);
             if (!response.IsSuccessful)
             {
-                LogError(BaseUrl, request, response);
+                ThrowException(BaseUrl, request, response);
             }
         }
 
@@ -192,7 +185,7 @@ namespace ApiBaseClient
                 }
                 else
                 {
-                    LogError(BaseUrl, request, response);
+                    ThrowException(BaseUrl, request, response);
                     return default(T);
                 }
             }
@@ -212,7 +205,7 @@ namespace ApiBaseClient
                 }
                 else
                 {
-                    LogError(BaseUrl, request, response);
+                    ThrowException(BaseUrl, request, response);
                     return default(T);
                 }
             }
