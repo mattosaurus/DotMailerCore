@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DotMailerCore
+namespace ApiBaseClient
 {
     /// <summary>
     /// A HTTP client wrapper for interacting with an API

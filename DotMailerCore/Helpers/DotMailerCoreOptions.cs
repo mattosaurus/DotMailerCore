@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DotMailerCore.Clients
+namespace DotMailerCore.Helpers
 {
     public class DotMailerCoreOptions
     {

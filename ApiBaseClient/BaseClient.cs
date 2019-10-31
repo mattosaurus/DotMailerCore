@@ -1,5 +1,4 @@
-﻿using DotMailerCore.Helpers;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Deserializers;
@@ -10,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DotMailerCore.Clients
+namespace ApiBaseClient
 {
     public class BaseClient : RestSharp.RestClient, IBaseClient
     {

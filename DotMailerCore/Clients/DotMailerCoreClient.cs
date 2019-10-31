@@ -1,4 +1,5 @@
-﻿using DotMailerCore.Clients;
+﻿using ApiBaseClient;
+using DotMailerCore.Clients;
 using DotMailerCore.Helpers;
 using DotMailerCore.Models;
 using Microsoft.Extensions.Logging;
@@ -14,9 +15,6 @@ namespace DotMailerCore
 {
     public class DotMailerCoreClient : BaseClient, IDotMailerCoreClient
     {
-        const string _baseUrl = "https://api.dotmailer.com/v2/";
-        private readonly ILogger _logger;
-
         public DotMailerCoreClient(ICacheService cache, IDeserializer serializer, ILoggerFactory loggerFactory, IOptions<DotMailerCoreOptions> options)
             : base(cache, serializer, loggerFactory, options.Value.BaseUrl, options.Value.Authenticator) { }
 

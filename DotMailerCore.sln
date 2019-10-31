@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotMailerCore", "DotMailerCore\DotMailerCore.csproj", "{595A5F45-0A15-4AFB-9021-FD1D7ABBE91F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotMailerCore", "DotMailerCore\DotMailerCore.csproj", "{595A5F45-0A15-4AFB-9021-FD1D7ABBE91F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotMailerCore.Testing", "DotMailerCore.Testing\DotMailerCore.Testing.csproj", "{DB2C18D7-B6CB-4B0D-84BF-23B2D9D6192A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotMailerCore.Testing", "DotMailerCore.Testing\DotMailerCore.Testing.csproj", "{DB2C18D7-B6CB-4B0D-84BF-23B2D9D6192A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiBaseClient", "ApiBaseClient\ApiBaseClient.csproj", "{E65B3CF1-4423-4F64-9D00-AB888300164E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{DB2C18D7-B6CB-4B0D-84BF-23B2D9D6192A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB2C18D7-B6CB-4B0D-84BF-23B2D9D6192A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB2C18D7-B6CB-4B0D-84BF-23B2D9D6192A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E65B3CF1-4423-4F64-9D00-AB888300164E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E65B3CF1-4423-4F64-9D00-AB888300164E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E65B3CF1-4423-4F64-9D00-AB888300164E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E65B3CF1-4423-4F64-9D00-AB888300164E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

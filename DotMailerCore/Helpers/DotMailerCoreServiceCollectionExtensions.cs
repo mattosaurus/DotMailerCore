@@ -1,9 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DotMailerCore.Clients;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DotMailerCore.Clients
+namespace DotMailerCore.Helpers
 {
     public static class DotMailerCoreServiceCollectionExtensions
     {
