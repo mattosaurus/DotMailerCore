@@ -1,38 +1,14 @@
-using DotMailerCore.Models;
+﻿using DotMailerCore.Models;
 using DotMailerCore.Models.Types;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace DotMailerCore.Tests
+namespace DotMailerCore.Tests.UnitTests
 {
-    public class DotMailerCoreClientUnitTest
+    public class AddressBookUnitTest
     {
-        [Fact]
-        public async Task GetAccountInformation_ReturnsAnAccountResponse()
-        {
-            // Arrange
-            var client = TestFactory.GetClient();
-
-            // Act
-            var response = await client.GetAccountInformationAsync();
-
-            // Assert
-            var model = Assert.IsAssignableFrom<Account>(response);
-        }
-
-        [Fact]
-        public async Task EmptyRecycleBin()
-        {
-            // Arrange
-            var client = TestFactory.GetClient();
-
-            // Act
-            await client.EmptyRecycleBinAsync();
-        }
-
         [Fact]
         public async Task CreateAddressBook_ReturnsAnAddressBookResponse()
         {
