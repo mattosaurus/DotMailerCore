@@ -7,7 +7,7 @@ namespace DotMailerCore.Models
 	{
 		public string Name { get; set; }
 
-		public DataTypes Type { get; set; }
+		public DataType Type { get; set; }
 
 		public DataFieldVisibility Visibility { get; set; }
 	}

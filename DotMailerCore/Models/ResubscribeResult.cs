@@ -7,6 +7,6 @@ namespace DotMailerCore.Models
 	{
 		public Contact Contact { get; set; }
 
-		public ResubscribeStatuses Status { get; set; }
+		public ResubscribeStatus Status { get; set; }
 	}
 }

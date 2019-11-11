@@ -10,6 +10,6 @@ namespace DotMailerCore.Models
 
 		public DateTime DateRemoved { get; set; }
 
-		public ContactStatuses Reason { get; set; }
+		public ContactStatus Reason { get; set; }
 	}
 }

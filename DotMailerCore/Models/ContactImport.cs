@@ -8,6 +8,6 @@ namespace DotMailerCore.Models
 	{
 		public Guid Id { get; set; }
 
-		public ContactImportStatuses Status { get; set; }
+		public ContactImportStatus Status { get; set; }
 	}
 }

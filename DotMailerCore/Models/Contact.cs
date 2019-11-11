@@ -9,12 +9,12 @@ namespace DotMailerCore.Models
 
 		public string Email { get; set; }
 
-		public ContactOptInTypes OptInType { get; set; }
+		public ContactOptInType OptInType { get; set; }
 
-		public ContactEmailTypes EmailType { get; set; }
+		public ContactEmailType EmailType { get; set; }
 
 		public List<DataField> DataFields { get; set; }
 
-		public ContactStatuses Status { get; set; }
+		public ContactStatus Status { get; set; }
 	}
 }

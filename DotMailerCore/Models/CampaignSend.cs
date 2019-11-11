@@ -16,8 +16,8 @@ namespace DotMailerCore.Models
 
 		public DateTime SendDate { get; set; }
 
-		public SplitTestSendOptions SplitTestOptions { get; set; }
+		public SplitTestOptions SplitTestOptions { get; set; }
 
-		public CampaignSendStatuses Status { get; set; }
+		public CampaignSendStatus Status { get; set; }
 	}
 }

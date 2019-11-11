@@ -22,12 +22,12 @@ namespace DotMailerCore.Models
 
         public List<string> PlainTextContents { get; set; }
 
-        public CampaignReplyActions ReplyAction { get; set; }
+        public CampaignReplyAction ReplyAction { get; set; }
 
         public string ReplyToAddress { get; set; }
 
         public bool IsSplitTest { get; set; }
 
-        public CampaignStatuses Status { get; set; }
+        public CampaignStatus Status { get; set; }
     }
 }

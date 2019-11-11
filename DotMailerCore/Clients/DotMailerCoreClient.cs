@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Deserializers;
+using RestSharp.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,8 +16,16 @@ namespace DotMailerCore
 {
     public class DotMailerCoreClient : BaseClient, IDotMailerCoreClient
     {
-        public DotMailerCoreClient(ICacheService cache, IDeserializer serializer, IOptions<DotMailerCoreOptions> options)
-            : base(options.Value.BaseUrl, cache, serializer, options.Value.Authenticator) { }
+        private readonly IRestSerializer _serializer;
+
+        public DotMailerCoreClient(ICacheService cache, IDeserializer deserializer, IRestSerializer serializer, IOptions<DotMailerCoreOptions> options)
+            : base(options.Value.BaseUrl, cache, deserializer, options.Value.Authenticator)
+        {
+            _serializer = serializer;
+        }
+
+        public DotMailerCoreClient(IDeserializer serializer, IOptions<DotMailerCoreOptions> options)
+            : base(options.Value.BaseUrl, options.Value.Authenticator, serializer) { }
 
         public DotMailerCoreClient(IOptions<DotMailerCoreOptions> options)
             : base(options.Value.BaseUrl, options.Value.Authenticator) { }
@@ -28,7 +37,7 @@ namespace DotMailerCore
         /// </summary>
         public async Task<Account> GetAccountInformationAsync()
         {
-            var request = new RestRequest("account-info");
+            var request = new RestRequest("account-info") { JsonSerializer = _serializer };
             return await MakeRequestAsync<Account>(request);
         }
 
@@ -37,7 +46,7 @@ namespace DotMailerCore
         /// </summary>
         public async Task EmptyRecycleBinAsync()
         {
-            var request = new RestRequest("accounts/empty-recycle-bin/", Method.POST);
+            var request = new RestRequest("accounts/empty-recycle-bin/", Method.POST) { JsonSerializer = _serializer };
             await MakeRequestAsync(request);
         }
 
@@ -50,7 +59,7 @@ namespace DotMailerCore
         /// </summary>
         public async Task<AddressBook> CreateAddressBookAsync(AddressBook addressBook)
         {
-            var request = new RestRequest("/address-books", Method.POST);
+            var request = new RestRequest("/address-books", Method.POST) { JsonSerializer = _serializer };
             request.AddJsonBody(addressBook);
 
             return await MakeRequestAsync<AddressBook>(request);
@@ -61,7 +70,7 @@ namespace DotMailerCore
         /// </summary>
         public async Task DeleteAddressBookAsync(int id)
         {
-            var request = new RestRequest("/address-books/{id}", Method.DELETE);
+            var request = new RestRequest("/address-books/{id}", Method.DELETE) { JsonSerializer = _serializer };
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
             await MakeRequestAsync(request);
@@ -74,7 +83,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<AddressBook> UpdateAddressBookAsync(AddressBook addressBook)
         {
-            var request = new RestRequest("/address-books/{id}", Method.PUT);
+            var request = new RestRequest("/address-books/{id}", Method.PUT) { JsonSerializer = _serializer };
             request.AddParameter("id", addressBook.Id, ParameterType.UrlSegment);
             request.AddJsonBody(addressBook);
 
@@ -88,7 +97,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<AddressBook> GetAddressBookAsync(int id)
         {
-            var request = new RestRequest("/address-books/{id}");
+            var request = new RestRequest("/address-books/{id}") { JsonSerializer = _serializer };
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
             return await MakeRequestAsync<AddressBook>(request);
@@ -102,7 +111,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<List<AddressBook>> GetAddressBooksAsync(int select = 1000, int skip = 0)
         {
-            var request = new RestRequest("/address-books/");
+            var request = new RestRequest("/address-books/") { JsonSerializer = _serializer };
             request.AddParameter("select", select, ParameterType.QueryString);
             request.AddParameter("skip", skip, ParameterType.QueryString);
 
@@ -117,7 +126,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<List<AddressBook>> GetPrivateAddressBooksAsync(int select = 1000, int skip = 0)
         {
-            var request = new RestRequest("/address-books/private");
+            var request = new RestRequest("/address-books/private") { JsonSerializer = _serializer };
             request.AddParameter("select", select, ParameterType.QueryString);
             request.AddParameter("skip", skip, ParameterType.QueryString);
 
@@ -132,7 +141,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<List<AddressBook>> GetPublicAddressBooksAsync(int select = 1000, int skip = 0)
         {
-            var request = new RestRequest("/address-books/public");
+            var request = new RestRequest("/address-books/public") { JsonSerializer = _serializer };
             request.AddParameter("select", select, ParameterType.QueryString);
             request.AddParameter("skip", skip, ParameterType.QueryString);
 
@@ -150,7 +159,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<Campaign> CreateCampaignAsync(Campaign campaign)
         {
-            var request = new RestRequest("/campaigns", Method.POST);
+            var request = new RestRequest("/campaigns", Method.POST) { JsonSerializer = _serializer };
             request.AddJsonBody(campaign);
 
             return await MakeRequestAsync<Campaign>(request);
@@ -163,7 +172,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<SplitTestCampaign> CreateSplitTestCampaignAsync(SplitTestCampaign splitTestCampaign)
         {
-            var request = new RestRequest("/campaigns/split-test", Method.POST);
+            var request = new RestRequest("/campaigns/split-test", Method.POST) { JsonSerializer = _serializer };
             request.AddJsonBody(splitTestCampaign);
 
             return await MakeRequestAsync<SplitTestCampaign>(request);
@@ -176,7 +185,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<Campaign> UpdateCampaignAsync(Campaign campaign)
         {
-            var request = new RestRequest("/campaigns/{id}", Method.PUT);
+            var request = new RestRequest("/campaigns/{id}", Method.PUT) { JsonSerializer = _serializer };
             request.AddParameter("id", campaign.Id, ParameterType.UrlSegment);
             request.AddJsonBody(campaign);
 
@@ -190,7 +199,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<Campaign> CopyCampaignAsync(int id)
         {
-            var request = new RestRequest("/campaigns/{id}/copy", Method.POST);
+            var request = new RestRequest("/campaigns/{id}/copy", Method.POST) { JsonSerializer = _serializer };
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
             return await MakeRequestAsync<Campaign>(request);
@@ -203,7 +212,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task DeleteCampaignAsync(int id)
         {
-            var request = new RestRequest("/campaigns/{id}", Method.DELETE);
+            var request = new RestRequest("/campaigns/{id}", Method.DELETE) { JsonSerializer = _serializer };
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
             await MakeRequestAsync(request);
@@ -216,7 +225,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<CampaignSend> SendCampaignAsync(CampaignSend campaignSend)
         {
-            var request = new RestRequest("/campaigns/send", Method.POST);
+            var request = new RestRequest("/campaigns/send", Method.POST) { JsonSerializer = _serializer };
             request.AddJsonBody(campaignSend);
 
             return await MakeRequestAsync<CampaignSend>(request);
@@ -229,7 +238,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<CampaignSend> SendTimeOptimisedCampaignAsync(CampaignSend campaignSend)
         {
-            var request = new RestRequest("/campaigns/send-time-optimised", Method.POST);
+            var request = new RestRequest("/campaigns/send-time-optimised", Method.POST) { JsonSerializer = _serializer };
             request.AddJsonBody(campaignSend);
 
             return await MakeRequestAsync<CampaignSend>(request);
@@ -242,7 +251,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<CampaignSend> GetCampaignSendStatusAsync(Guid id)
         {
-            var request = new RestRequest("/campaigns/send/{id}");
+            var request = new RestRequest("/campaigns/send/{id}") { JsonSerializer = _serializer };
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
             return await MakeRequestAsync<CampaignSend>(request);
@@ -256,7 +265,7 @@ namespace DotMailerCore
         /// <returns></returns>
         public async Task<Attatchment> AddCampaignAttachmentAsync(int id, Attatchment attatchment)
         {
-            var request = new RestRequest("/campaigns/{id}/attachments", Method.POST);
+            var request = new RestRequest("/campaigns/{id}/attachments", Method.POST) { JsonSerializer = _serializer };
             request.AddParameter("id", id, ParameterType.UrlSegment);
             request.AddJsonBody(attatchment);
 
@@ -265,7 +274,7 @@ namespace DotMailerCore
 
         public async Task RemoveCampaignAttachmentAsync(int campaignId, int documentId)
         {
-            var request = new RestRequest("/campaigns/{campaignId}/attachments/{documentId}", Method.DELETE);
+            var request = new RestRequest("/campaigns/{campaignId}/attachments/{documentId}", Method.DELETE) { JsonSerializer = _serializer };
             request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
             request.AddParameter("documentId", documentId, ParameterType.UrlSegment);
 

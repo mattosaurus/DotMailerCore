@@ -7,6 +7,6 @@ namespace DotMailerCore.Models
 	{
 		public int Id { get; set; }
 
-		public SegmentRefreshStatuses Status { get; set; }
+		public SegmentRefreshStatus Status { get; set; }
 	}
 }

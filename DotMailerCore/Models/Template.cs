@@ -17,7 +17,7 @@ namespace DotMailerCore.Models
 
 		public string PlainTextContent { get; set; }
 
-		public CampaignReplyActions ReplyAction { get; set; }
+		public CampaignReplyAction ReplyAction { get; set; }
 
 		public string ReplyToAddress { get; set; }
 	}

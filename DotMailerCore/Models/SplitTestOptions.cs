@@ -3,9 +3,9 @@ using DotMailerCore.Models.Types;
 
 namespace DotMailerCore.Models
 {
-	public class SplitTestSendOptions
+	public class SplitTestOptions
 	{
-		public SplitTestMetrics TestMetric { get; set; }
+		public TestMetric TestMetric { get; set; }
 
 		public int TestPercentage { get; set; }
 

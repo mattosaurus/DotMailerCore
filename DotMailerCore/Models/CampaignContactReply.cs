@@ -22,6 +22,6 @@ namespace DotMailerCore.Models
 
 		public DateTime DateReplied { get; set; }
 
-		public CampaignReplyTypes ReplyType { get; set; }
+		public CampaignReplyType ReplyType { get; set; }
 	}
 }

@@ -12,7 +12,7 @@ namespace DotMailerCore.Models
 
 		public string MarkerName { get; set; }
 
-		public RoiDetailDataTypes DataType { get; set; }
+		public RoiDetailDataType DataType { get; set; }
 
 		public DateTime DateEntered { get; set; }
 	}
