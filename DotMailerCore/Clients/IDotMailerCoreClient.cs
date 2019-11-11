@@ -50,7 +50,7 @@ namespace DotMailerCore.Clients
 
         Task<List<Campaign>> GetCampaignsAsync(int select, int skip);
 
-        Task<List<Campaign>> GetCampaignsSentToAddressBookAsync(int campaignId, int select, int skip);
+        Task<List<Campaign>> GetCampaignsSentToAddressBookAsync(int addressBookId, int select, int skip);
 
         Task<List<Campaign>> GetCampaignsSentToSegmentBookAsync(int segmentId, int select, int skip);
 

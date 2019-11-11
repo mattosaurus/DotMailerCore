@@ -339,7 +339,7 @@ namespace DotMailerCore
         /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
         /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL</param>
         /// <returns></returns>
-        public async Task<List<Campaign>> GetCampaignsSentToSegmentBookAsync(int segmentId, int select = 1000, int skip = 0)
+        public async Task<List<Campaign>> GetCampaignsSentToSegmentBookAsync(int addressBookId, int select = 1000, int skip = 0)
         {
             var request = new RestRequest("/address-books/{segmentId}/campaigns") { JsonSerializer = _serializer };
             request.AddParameter("segmentId", segmentId, ParameterType.UrlSegment);
