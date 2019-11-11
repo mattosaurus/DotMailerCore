@@ -24,14 +24,14 @@ namespace ApiBaseClient
         /// Create a ApiException with message
         /// </summary>
         /// <param name="message">Exception message</param>
-        public ApiException(string message) { }
+        public ApiException(string message) : base (message) { }
 
         /// <summary>
         /// Create an ApiException from another Exception
         /// </summary>
         /// <param name="message">Exception message</param>
         /// <param name="exception">Exception to copy detatils from</param>
-        public ApiException(string message, Exception exception) { }
+        public ApiException(string message, Exception exception) : base(message, exception) { }
 
         /// <summary>
         /// Create an ApiException
@@ -45,7 +45,7 @@ namespace ApiBaseClient
             string message,
             string moreInfo,
             Exception exception = null
-        )
+        ) : base(message, exception)
         {
             Status = status;
             MoreInfo = moreInfo;

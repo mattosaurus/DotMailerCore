@@ -1,7 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ApiBaseClient.Helpers;
+using Microsoft.Extensions.Logging;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Deserializers;
+using RestSharp.Serialization;
+using RestSharp.Serializers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,28 +18,37 @@ namespace ApiBaseClient
     {
         protected ICacheService _cache;
 
-        public BaseClient(string baseUrl, ICacheService cache, IDeserializer serializer, IAuthenticator authenticator)
+        public BaseClient(string baseUrl, ICacheService cache, IDeserializer deserializer, IAuthenticator authenticator)
         {
             _cache = cache;
-            AddHandler("application/json", () => serializer);
-            AddHandler("text/json", () => serializer);
-            AddHandler("text/x-json", () => serializer);
+            AddHandler("application/json", () => deserializer);
+            AddHandler("text/json", () => deserializer);
+            AddHandler("text/x-json", () => deserializer);
             BaseUrl = new Uri(baseUrl);
             Authenticator = authenticator;
         }
 
-        public BaseClient(string baseUrl, ICacheService cache, IDeserializer serializer)
+        public BaseClient(string baseUrl, ICacheService cache, IDeserializer deserializer)
         {
             _cache = cache;
-            AddHandler("application/json", () => serializer);
-            AddHandler("text/json", () => serializer);
-            AddHandler("text/x-json", () => serializer);
+            AddHandler("application/json", () => deserializer);
+            AddHandler("text/json", () => deserializer);
+            AddHandler("text/x-json", () => deserializer);
             BaseUrl = new Uri(baseUrl);
+        }
+
+        public BaseClient(string baseUrl, IAuthenticator authenticator, IDeserializer deserializer)
+        {
+            AddHandler("application/json", () => deserializer);
+            AddHandler("text/json", () => deserializer);
+            AddHandler("text/x-json", () => deserializer);
+            BaseUrl = new Uri(baseUrl);
+            Authenticator = authenticator;
         }
 
         public BaseClient(string baseUrl, IAuthenticator authenticator)
         {
-            JsonSerializer jsonSerializer = new JsonSerializer();
+            NewtonsoftJsonRestSerializer jsonSerializer = new NewtonsoftJsonRestSerializer();
 
             AddHandler("application/json", () => jsonSerializer);
             AddHandler("text/json", () => jsonSerializer);
@@ -47,7 +59,7 @@ namespace ApiBaseClient
 
         public BaseClient(string baseUrl)
         {
-            JsonSerializer jsonSerializer = new JsonSerializer();
+            NewtonsoftJsonRestSerializer jsonSerializer = new NewtonsoftJsonRestSerializer();
 
             AddHandler("application/json", () => jsonSerializer);
             AddHandler("text/json", () => jsonSerializer);
@@ -65,23 +77,25 @@ namespace ApiBaseClient
                 + parameters + ", and content: " + response.Content;
 
             //Acquire the actual exception
-            Exception ex;
+            Exception exception;
             if (response != null && response.ErrorException != null)
             {
-                ex = response.ErrorException;
+                exception = response.ErrorException;
             }
             else
             {
-                ex = new Exception(info);
+                exception = new Exception(info);
                 info = string.Empty;
             }
 
-            throw new ApiException(
+            ApiException apiException = new ApiException(
                 (int)response.StatusCode,
-                ex.Message,
+                exception.Message,
                 info,
-                ex
+                exception
                 );
+
+            throw apiException;
         }
 
         private bool TimeoutCheck(IRestRequest request, IRestResponse response)
