@@ -41,6 +41,11 @@ namespace DotMailerCore.Tests
             return 1;
         }
 
+        public static int GetSegmentId()
+        {
+            return 2;
+        }
+
         public static Campaign GetCampaign()
         {
             return new Campaign()
@@ -242,6 +247,31 @@ namespace DotMailerCore.Tests
                 FileSize = 24225,
                 DateCreated = DateTime.Parse("2015-11-24T11:48:38.397"),
                 DateModified = DateTime.Parse("2015-11-24T11:48:38.397")
+            };
+        }
+
+        public static List<Attatchment> GetCampaignAttatchments()
+        {
+            return new List<Attatchment>()
+            {
+                new Attatchment()
+                {
+                    Id = 2,
+                    Name = "Conference schedule.pdf",
+                    FileName = @"/cmpdoc/5/0/7/4/7/files/1_conference-schedule.pdf",
+                    FileSize = 24225,
+                    DateCreated = DateTime.Parse("2015-11-24T11:48:38.397"),
+                    DateModified = DateTime.Parse("2015-11-24T11:48:38.397")
+                },
+                new Attatchment()
+                {
+                    Id = 3,
+                    Name = "Directions to Conference.pdf",
+                    FileName = @"/cmpdoc/5/0/7/4/7/files/3_directions-to-conference.pdf",
+                    FileSize = 24225,
+                    DateCreated = DateTime.Parse("2015-11-24T11:48:38.397"),
+                    DateModified = DateTime.Parse("2015-11-24T11:48:38.397")
+                },
             };
         }
 

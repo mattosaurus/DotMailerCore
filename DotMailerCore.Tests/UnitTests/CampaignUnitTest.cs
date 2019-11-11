@@ -156,5 +156,103 @@ namespace DotMailerCore.Tests.UnitTests
             // Act
             await mockClient.Object.RemoveCampaignAttachmentAsync(campaignId, campaignAttatchmentId);
         }
+
+        [Fact]
+        public async Task GetCampaignAttatchments_ReturnsAnAttatchmentsListResponse()
+        {
+            // Arrange
+            var campaignId = TestFactory.GetCampaignId();
+            var mockClient = new Mock<IDotMailerCoreClient>();
+            mockClient.Setup(client => client.GetCampaignAttachmentsAsync(campaignId)).Returns(Task.FromResult(TestFactory.GetCampaignAttatchments()));
+
+            // Act
+            var response = await mockClient.Object.GetCampaignAttachmentsAsync(campaignId);
+
+            // Assert
+            var model = Assert.IsAssignableFrom<List<Attatchment>>(response);
+        }
+
+        [Fact]
+        public async Task GetCampaigns_ReturnsACampaignListResponse()
+        {
+            // Arrange
+            var client = TestFactory.GetClient();
+
+            // Act
+            var response = await client.GetCampaignsAsync();
+
+            // Assert
+            var model = Assert.IsAssignableFrom<List<Campaign>>(response);
+        }
+
+        [Fact]
+        public async Task GetCampaignsSentToAddressBook_ReturnsACampaignListResponse()
+        {
+            // Arrange
+            var client = TestFactory.GetClient();
+            var addressBookId = TestFactory.GetAddressBookId();
+
+            // Act
+            var response = await client.GetCampaignsSentToAddressBookAsync(addressBookId);
+
+            // Assert
+            var model = Assert.IsAssignableFrom<List<Campaign>>(response);
+        }
+
+        [Fact]
+        public async Task GetCampaignsSentToSegment_ReturnsACampaignListResponse()
+        {
+            // Arrange
+            var client = TestFactory.GetClient();
+            var segmentId = TestFactory.GetSegmentId();
+
+            // Act
+            var response = await client.GetCampaignsSentToSegmentAsync(segmentId);
+
+            // Assert
+            var model = Assert.IsAssignableFrom<List<Campaign>>(response);
+        }
+
+        [Fact]
+        public async Task GetCampaign_ReturnsACampaignResponse()
+        {
+            // Arrange
+            var client = TestFactory.GetClient();
+            var campaignId = TestFactory.GetCampaignId();
+
+            // Act
+            var response = await client.GetCampaignAsync(campaignId);
+
+            // Assert
+            var model = Assert.IsAssignableFrom<Campaign>(response);
+        }
+
+        [Fact]
+        public async Task GetCampaignWithDetails_ReturnsACampaignWithDetailsResponse()
+        {
+            // Arrange
+            var client = TestFactory.GetClient();
+            var campaignId = TestFactory.GetCampaignId();
+
+            // Act
+            var response = await client.GetCampaignWithDetailsAsync(campaignId);
+
+            // Assert
+            var model = Assert.IsAssignableFrom<Campaign>(response);
+        }
+
+        [Fact]
+        public async Task GetCampaignSummary_ReturnsACampaignSummaryResponse()
+        {
+            // Arrange
+            var client = TestFactory.GetClient();
+            var campaignId = TestFactory.GetCampaignId();
+
+            // Act
+            var response = await client.GetCampaignSummaryAsync(campaignId);
+
+            // Assert
+            var model = Assert.IsAssignableFrom<CampaignSummary>(response);
+        }
     }
 }
