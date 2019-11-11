@@ -1,10 +1,16 @@
 ﻿using ApiBaseClient;
+using ApiBaseClient.Helpers;
 using DotMailerCore.Helpers;
+using DotMailerCore.Models;
+using DotMailerCore.Models.Types;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using RestSharp.Authenticators;
 using RestSharp.Deserializers;
+using RestSharp.Serialization;
+using RestSharp.Serializers;
 using Serilog;
 using System;
 using System.IO;
@@ -41,16 +47,28 @@ namespace DotMailerCore.Testing
                 // Create service provider
                 IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
-                //IOptions<DotMailerCoreOptions> options = Options.Create<DotMailerCoreOptions>(new DotMailerCoreOptions()
-                //    {
-                //        BaseUrl = "https://api.dotmailer.com/v2/",
-                //        Authenticator = new HttpBasicAuthenticator("demo@apiconnector.com", "demo")
-                //    }
-                //);
+                IOptions<DotMailerCoreOptions> options = Options.Create<DotMailerCoreOptions>(new DotMailerCoreOptions()
+                {
+                    BaseUrl = "https://api.dotmailer.com/v2/",
+                    Authenticator = new HttpBasicAuthenticator("demo@apiconnector.com", "demo")
+                }
+                );
 
-                //DotMailerCoreClient dotMailerCoreClient = new DotMailerCoreClient(options);
+                DotMailerCoreClient dotMailerCoreClient = new DotMailerCoreClient(options);
 
-                //Account apiAccount = await dotMailerCoreClient.GetAccountInformationAsync();
+                CampaignSend campaignSend = new CampaignSend()
+                {
+                    Id = new Guid("e8224c2b-a670-461e-b060-4ec776e9e7c2"),
+                    CampaignId = 1,
+                    SendDate = DateTime.Parse("2015-10-31T00:00:00"),
+                    SplitTestOptions = new SplitTestOptions()
+                    {
+                        TestMetric = TestMetric.Opens,
+                        TestPercentage = 50,
+                        TestPeriodHours = 5
+                    }
+                };
+                await dotMailerCoreClient.SendCampaignAsync(campaignSend);
 
                 await serviceProvider.GetService<App>().Run();
             }
@@ -98,7 +116,9 @@ namespace DotMailerCore.Testing
             serviceCollection.AddSingleton<ICacheService, InMemoryCache>();
 
             // Add json deserialization service
-            serviceCollection.AddSingleton<IDeserializer, JsonSerializer>();
+            serviceCollection.AddSingleton<IDeserializer, NewtonsoftJsonRestSerializer>();
+            // Add json deserialization service
+            serviceCollection.AddSingleton<IRestSerializer, NewtonsoftJsonRestSerializer>();
 
             // Add client
             serviceCollection.AddDotMailer(options =>

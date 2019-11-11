@@ -1,5 +1,6 @@
 ﻿using DotMailerCore.Clients;
 using DotMailerCore.Models;
+using DotMailerCore.Models.Types;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -21,23 +22,37 @@ namespace DotMailerCore.Testing
 
         public async Task Run()
         {
-            _logger.LogInformation("Getting account information");
-            Account apiAccount = await _dotMailerCoreClient.GetAccountInformationAsync();
+            //_logger.LogInformation("Getting account information");
+            //Account apiAccount = await _dotMailerCoreClient.GetAccountInformationAsync();
 
-            _logger.LogInformation("Emptying recycle bin");
-            await _dotMailerCoreClient.EmptyRecycleBinAsync();
+            //_logger.LogInformation("Emptying recycle bin");
+            //await _dotMailerCoreClient.EmptyRecycleBinAsync();
 
-            AddressBook addressBookRequest = new AddressBook()
+            //AddressBook addressBookRequest = new AddressBook()
+            //{
+            //    Name = "My Address Book",
+            //    Visibility = AddressBookVisibility.Public
+            //};
+
+            //_logger.LogInformation("Creating address book");
+            //AddressBook addressBookResponse = await _dotMailerCoreClient.CreateAddressBookAsync(addressBookRequest);
+
+            //_logger.LogInformation("deleting address book");
+            //await _dotMailerCoreClient.DeleteAddressBookAsync(1);
+
+            CampaignSend campaignSend = new CampaignSend()
             {
-                Name = "My Address Book",
-                Visibility = Models.Types.AddressBookVisibility.Public
+                Id = new Guid("e8224c2b-a670-461e-b060-4ec776e9e7c2"),
+                CampaignId = 1,
+                SendDate = DateTime.Parse("2015-10-31T00:00:00"),
+                SplitTestOptions = new SplitTestOptions()
+                {
+                    TestMetric = TestMetric.Opens,
+                    TestPercentage = 50,
+                    TestPeriodHours = 5
+                }
             };
-
-            _logger.LogInformation("Creating address book");
-            AddressBook addressBookResponse = await _dotMailerCoreClient.CreateAddressBookAsync(addressBookRequest);
-
-            _logger.LogInformation("deleting address book");
-            await _dotMailerCoreClient.DeleteAddressBookAsync(1);
+            await _dotMailerCoreClient.SendCampaignAsync(campaignSend);
         }
     }
 }
