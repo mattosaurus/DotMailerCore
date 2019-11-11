@@ -1,6 +1,6 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum SegmentRefreshStatuses
+	public enum SegmentRefreshStatus
 	{
 		NotStarted,
 		NotFinished,

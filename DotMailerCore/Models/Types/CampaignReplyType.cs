@@ -1,6 +1,6 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum CampaignReplyTypes
+	public enum CampaignReplyType
 	{
 		Reply,
 		AutoReply,

@@ -1,6 +1,6 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum SplitTestMetrics
+	public enum TestMetric
 	{
 		Opens,
 		Clicks,

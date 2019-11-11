@@ -1,6 +1,6 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum DataTypes
+	public enum RoiDetailDataType
 	{
 		String,
 		Numeric,

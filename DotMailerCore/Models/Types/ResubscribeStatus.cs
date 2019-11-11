@@ -1,6 +1,6 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum ResubscribeStatuses
+	public enum ResubscribeStatus
 	{
 		ContactAdded,
 		ContactChallenged,

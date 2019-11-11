@@ -1,11 +1,9 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum RoiDetailDataTypes
+	public enum ContactEmailType
 	{
-		String,
-		Numeric,
-		Date,
-		Boolean,
+		PlainText,
+		Html,
 		NotAvailableInThisVersion
 	}
 }

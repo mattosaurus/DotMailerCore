@@ -1,6 +1,6 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum ContactOptInTypes
+	public enum ContactOptInType
 	{
 		Unknown,
 		Single,

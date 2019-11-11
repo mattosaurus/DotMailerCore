@@ -1,6 +1,6 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum CampaignReplyActions
+	public enum CampaignReplyAction
 	{
 		Unset,
 		WebMailForward,

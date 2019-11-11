@@ -1,6 +1,6 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum CampaignSendStatuses
+	public enum CampaignSendStatus
 	{
 		NotSent,
 		Scheduled,

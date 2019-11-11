@@ -1,6 +1,6 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum CampaignStatuses
+	public enum CampaignStatus
 	{
 		Unsent,
 		Sending,

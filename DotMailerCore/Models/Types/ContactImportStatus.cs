@@ -1,6 +1,6 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum ContactImportStatuses
+	public enum ContactImportStatus
 	{
 		Finished,
 		NotFinished,

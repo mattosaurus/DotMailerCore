@@ -1,6 +1,6 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum ContactStatuses
+	public enum ContactStatus
 	{
 		Subscribed,
 		Unsubscribed,

@@ -1,6 +1,6 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum TransactionalDataImportStatuses
+	public enum TransactionalDataImportStatus
 	{
 		NotStarted,
 		NotFinished,

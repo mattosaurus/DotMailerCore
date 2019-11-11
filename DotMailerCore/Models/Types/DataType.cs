@@ -1,9 +1,11 @@
 namespace DotMailerCore.Models.Types
 {
-	public enum ContactEmailTypes
+	public enum DataType
 	{
-		PlainText,
-		Html,
+		String,
+		Numeric,
+		Date,
+		Boolean,
 		NotAvailableInThisVersion
 	}
 }
