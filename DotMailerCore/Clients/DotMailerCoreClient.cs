@@ -272,6 +272,12 @@ namespace DotMailerCore
             return await MakeRequestAsync<Attatchment>(request);
         }
 
+        /// <summary>
+        /// Removes an attachment from a campaign
+        /// </summary>
+        /// <param name="campaignId"></param>
+        /// <param name="documentId"></param>
+        /// <returns></returns>
         public async Task RemoveCampaignAttachmentAsync(int campaignId, int documentId)
         {
             var request = new RestRequest("/campaigns/{campaignId}/attachments/{documentId}", Method.DELETE) { JsonSerializer = _serializer };
@@ -279,6 +285,102 @@ namespace DotMailerCore
             request.AddParameter("documentId", documentId, ParameterType.UrlSegment);
 
             await MakeRequestAsync(request);
+        }
+
+        /// <summary>
+        /// Gets documents that are currently attached to a campaign
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <returns></returns>
+        public async Task<List<Attatchment>> GetCampaignAttachmentsAsync(int campaignId)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/attachments") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+
+            return await MakeRequestAsync<List<Attatchment>>(request);
+        }
+
+        /// <summary>
+        /// Gets all campaigns
+        /// </summary>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<Campaign>> GetCampaignsAsync(int select, int skip)
+        {
+            var request = new RestRequest("/campaigns") { JsonSerializer = _serializer };
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await MakeRequestAsync<List<Campaign>>(request);
+        }
+
+        /// <summary>
+        /// Gets any campaigns that have been sent to an address book
+        /// </summary>
+        /// <param name="campaignId">The ID of the address book or segment, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL</param>
+        /// <returns></returns>
+        public async Task<List<Campaign>> GetCampaignsSentToAddressBookAsync(int campaignId, int select, int skip)
+        {
+            var request = new RestRequest("/address-books/{campaignId}/campaigns") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await MakeRequestAsync<List<Campaign>>(request);
+        }
+
+        /// <summary>
+        /// Gets any campaigns that have been sent to a segment
+        /// </summary>
+        /// <param name="campaignId">The ID of the address book or segment, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL</param>
+        /// <returns></returns>
+        public async Task<List<Campaign>> GetCampaignsSentToSegmentBookAsync(int segmentId, int select, int skip)
+        {
+            var request = new RestRequest("/address-books/{segmentId}/campaigns") { JsonSerializer = _serializer };
+            request.AddParameter("segmentId", segmentId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await MakeRequestAsync<List<Campaign>>(request);
+        }
+
+        /// <summary>
+        /// Gets a campaign by ID
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <returns></returns>
+        public async Task<Campaign> GetCampaignAsync(int campaignId)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+
+            return await MakeRequestAsync<Campaign>(request);
+        }
+
+        /// <summary>
+        /// Gets a campaign by ID, along with all its details
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <returns></returns>
+        public async Task<Campaign> GetCampaignWithDetailsAsync(int campaignId)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/with-details") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+
+            return await MakeRequestAsync<Campaign>(request);
+        }
+
+        public async Task<CampaignSummary> GetCampaignSummaryAsync(int campaignId)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/summary") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+
+            return await MakeRequestAsync<CampaignSummary>(request);
         }
 
         #endregion

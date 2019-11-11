@@ -45,5 +45,19 @@ namespace DotMailerCore.Clients
         Task<Attatchment> AddCampaignAttachmentAsync(int id, Attatchment attatchment);
 
         Task RemoveCampaignAttachmentAsync(int campaignId, int documentId);
+
+        Task<List<Attatchment>> GetCampaignAttachmentsAsync(int campaignId);
+
+        Task<List<Campaign>> GetCampaignsAsync(int select, int skip);
+
+        Task<List<Campaign>> GetCampaignsSentToAddressBookAsync(int campaignId, int select, int skip);
+
+        Task<List<Campaign>> GetCampaignsSentToSegmentBookAsync(int segmentId, int select, int skip);
+
+        Task<Campaign> GetCampaignAsync(int campaignId);
+
+        Task<Campaign> GetCampaignWithDetailsAsync(int campaignId);
+
+        Task<CampaignSummary> GetCampaignSummaryAsync(int campaignId);
     }
 }
