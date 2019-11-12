@@ -17,7 +17,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task CreateCampaign_ReturnsACampaignResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var campaign = TestFactory.GetCampaign();
 
             // Act
@@ -31,7 +31,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task CreateSplitTestCampaign_ReturnsASplitTestCampaignResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var campaign = TestFactory.GetSplitTestCampaign();
 
             // Act
@@ -45,7 +45,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task UpdateCampaign_ReturnsACampaignResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var campaign = TestFactory.GetCampaign();
 
             // Act
@@ -60,7 +60,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task CopyCampaign_ReturnsACampaignResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var campaign = TestFactory.GetCampaign();
 
             // Act
@@ -75,7 +75,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task DeleteCampaign()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var campaignId = TestFactory.GetCampaignId();
 
             // Act
@@ -118,7 +118,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetCampaignSendStatus_ReturnsACampaignSendStatusResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var campaignSendId = TestFactory.GetCampaignSendId();
 
             // Act
@@ -176,7 +176,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetCampaigns_ReturnsACampaignListResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
 
             // Act
             var response = await client.GetCampaignsAsync();
@@ -189,7 +189,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetCampaignsSentToAddressBook_ReturnsACampaignListResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var addressBookId = TestFactory.GetAddressBookId();
 
             // Act
@@ -203,7 +203,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetCampaignsSentToSegment_ReturnsACampaignListResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var segmentId = TestFactory.GetSegmentId();
 
             // Act
@@ -217,7 +217,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetCampaign_ReturnsACampaignResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var campaignId = TestFactory.GetCampaignId();
 
             // Act
@@ -231,7 +231,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetCampaignWithDetails_ReturnsACampaignWithDetailsResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var campaignId = TestFactory.GetCampaignId();
 
             // Act
@@ -245,7 +245,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetCampaignSummary_ReturnsACampaignSummaryResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var campaignId = TestFactory.GetCampaignId();
 
             // Act

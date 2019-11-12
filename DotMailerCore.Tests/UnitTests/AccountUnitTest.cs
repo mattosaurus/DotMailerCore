@@ -10,7 +10,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetAccountInformation_ReturnsAnAccountResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
 
             // Act
             var response = await client.GetAccountInformationAsync();
@@ -23,7 +23,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task EmptyRecycleBin()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
 
             // Act
             await client.EmptyRecycleBinAsync();

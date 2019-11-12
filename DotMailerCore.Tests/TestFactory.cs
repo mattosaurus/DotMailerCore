@@ -1,7 +1,12 @@
-﻿using DotMailerCore.Clients;
+﻿using ApiBaseClient;
+using ApiBaseClient.Helpers;
+using DotMailerCore.Clients;
 using DotMailerCore.Helpers;
 using DotMailerCore.Models;
 using DotMailerCore.Models.Types;
+using DotMailerCore.Tests.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using RestSharp.Authenticators;
 using System;
@@ -12,7 +17,7 @@ namespace DotMailerCore.Tests
 {
     public class TestFactory
     {
-        public static DotMailerCoreClient GetClient()
+        public static DotMailerCoreClient CreateClient()
         {
             IOptions<DotMailerCoreOptions> options = Options.Create<DotMailerCoreOptions>(new DotMailerCoreOptions()
                 {
@@ -21,9 +26,29 @@ namespace DotMailerCore.Tests
                 }
             );
 
-            DotMailerCoreClient dotMailerCoreClient = new DotMailerCoreClient(options);
+            NewtonsoftJsonRestSerializer jsonSerializer = new NewtonsoftJsonRestSerializer();
+            InMemoryCache inMemoryCache = new InMemoryCache();
+            NullLoggerFactory nullLoggerFactory = new NullLoggerFactory();
+
+            DotMailerCoreClient dotMailerCoreClient = new DotMailerCoreClient(inMemoryCache, jsonSerializer, jsonSerializer, options, nullLoggerFactory);
 
             return dotMailerCoreClient;
+        }
+
+        public static ILogger CreateLogger(LoggerTypes type = LoggerTypes.Null)
+        {
+            ILogger logger;
+
+            if (type == LoggerTypes.List)
+            {
+                logger = new ListLogger();
+            }
+            else
+            {
+                logger = NullLoggerFactory.Instance.CreateLogger("Null Logger");
+            }
+
+            return logger;
         }
 
         public static AddressBook GetAddressBook()

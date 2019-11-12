@@ -18,17 +18,11 @@ namespace DotMailerCore
     {
         private readonly IRestSerializer _serializer;
 
-        public DotMailerCoreClient(ICacheService cache, IDeserializer deserializer, IRestSerializer serializer, IOptions<DotMailerCoreOptions> options)
-            : base(options.Value.BaseUrl, cache, deserializer, options.Value.Authenticator)
+        public DotMailerCoreClient(ICacheService cache, IDeserializer deserializer, IRestSerializer serializer, IOptions<DotMailerCoreOptions> options, ILoggerFactory loggerFactory)
+            : base(options.Value.BaseUrl, cache, deserializer, options.Value.Authenticator, loggerFactory)
         {
             _serializer = serializer;
         }
-
-        public DotMailerCoreClient(IDeserializer serializer, IOptions<DotMailerCoreOptions> options)
-            : base(options.Value.BaseUrl, options.Value.Authenticator, serializer) { }
-
-        public DotMailerCoreClient(IOptions<DotMailerCoreOptions> options)
-            : base(options.Value.BaseUrl, options.Value.Authenticator) { }
 
         #region Account
 

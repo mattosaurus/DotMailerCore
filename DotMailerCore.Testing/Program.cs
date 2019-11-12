@@ -1,5 +1,6 @@
 ﻿using ApiBaseClient;
 using ApiBaseClient.Helpers;
+using DotMailerCore.Clients;
 using DotMailerCore.Helpers;
 using DotMailerCore.Models;
 using DotMailerCore.Models.Types;
@@ -47,28 +48,21 @@ namespace DotMailerCore.Testing
                 // Create service provider
                 IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
-                IOptions<DotMailerCoreOptions> options = Options.Create<DotMailerCoreOptions>(new DotMailerCoreOptions()
-                {
-                    BaseUrl = "https://api.dotmailer.com/v2/",
-                    Authenticator = new HttpBasicAuthenticator("demo@apiconnector.com", "demo")
-                }
-                );
+                //DotMailerCoreClient dotMailerCoreClient = (DotMailerCoreClient)serviceProvider.GetService(typeof(IDotMailerCoreClient));
 
-                DotMailerCoreClient dotMailerCoreClient = new DotMailerCoreClient(options);
-
-                CampaignSend campaignSend = new CampaignSend()
-                {
-                    Id = new Guid("e8224c2b-a670-461e-b060-4ec776e9e7c2"),
-                    CampaignId = 1,
-                    SendDate = DateTime.Parse("2015-10-31T00:00:00"),
-                    SplitTestOptions = new SplitTestOptions()
-                    {
-                        TestMetric = TestMetric.Opens,
-                        TestPercentage = 50,
-                        TestPeriodHours = 5
-                    }
-                };
-                await dotMailerCoreClient.SendCampaignAsync(campaignSend);
+                //CampaignSend campaignSend = new CampaignSend()
+                //{
+                //    Id = new Guid("e8224c2b-a670-461e-b060-4ec776e9e7c2"),
+                //    CampaignId = 1,
+                //    SendDate = DateTime.Parse("2015-10-31T00:00:00"),
+                //    SplitTestOptions = new SplitTestOptions()
+                //    {
+                //        TestMetric = TestMetric.Opens,
+                //        TestPercentage = 50,
+                //        TestPeriodHours = 5
+                //    }
+                //};
+                //await dotMailerCoreClient.SendCampaignAsync(campaignSend);
 
                 await serviceProvider.GetService<App>().Run();
             }

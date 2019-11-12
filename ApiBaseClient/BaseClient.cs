@@ -14,57 +14,22 @@ using System.Threading.Tasks;
 
 namespace ApiBaseClient
 {
+    // Based on ultimate RestSharp client
+    // https://exceptionnotfound.net/building-the-ultimate-restsharp-client-in-asp-net-and-csharp/
     public class BaseClient : RestSharp.RestClient, IBaseClient
     {
         protected ICacheService _cache;
+        private readonly ILogger _logger;
 
-        public BaseClient(string baseUrl, ICacheService cache, IDeserializer deserializer, IAuthenticator authenticator)
+        public BaseClient(string baseUrl, ICacheService cache, IDeserializer deserializer, IAuthenticator authenticator, ILoggerFactory loggerFactory)
         {
             _cache = cache;
+            _logger = loggerFactory.CreateLogger<BaseClient>();
             AddHandler("application/json", () => deserializer);
             AddHandler("text/json", () => deserializer);
             AddHandler("text/x-json", () => deserializer);
             BaseUrl = new Uri(baseUrl);
             Authenticator = authenticator;
-        }
-
-        public BaseClient(string baseUrl, ICacheService cache, IDeserializer deserializer)
-        {
-            _cache = cache;
-            AddHandler("application/json", () => deserializer);
-            AddHandler("text/json", () => deserializer);
-            AddHandler("text/x-json", () => deserializer);
-            BaseUrl = new Uri(baseUrl);
-        }
-
-        public BaseClient(string baseUrl, IAuthenticator authenticator, IDeserializer deserializer)
-        {
-            AddHandler("application/json", () => deserializer);
-            AddHandler("text/json", () => deserializer);
-            AddHandler("text/x-json", () => deserializer);
-            BaseUrl = new Uri(baseUrl);
-            Authenticator = authenticator;
-        }
-
-        public BaseClient(string baseUrl, IAuthenticator authenticator)
-        {
-            NewtonsoftJsonRestSerializer jsonSerializer = new NewtonsoftJsonRestSerializer();
-
-            AddHandler("application/json", () => jsonSerializer);
-            AddHandler("text/json", () => jsonSerializer);
-            AddHandler("text/x-json", () => jsonSerializer);
-            BaseUrl = new Uri(baseUrl);
-            Authenticator = authenticator;
-        }
-
-        public BaseClient(string baseUrl)
-        {
-            NewtonsoftJsonRestSerializer jsonSerializer = new NewtonsoftJsonRestSerializer();
-
-            AddHandler("application/json", () => jsonSerializer);
-            AddHandler("text/json", () => jsonSerializer);
-            AddHandler("text/x-json", () => jsonSerializer);
-            BaseUrl = new Uri(baseUrl);
         }
 
         private void ThrowException(Uri BaseUrl, IRestRequest request, IRestResponse response)
@@ -95,6 +60,8 @@ namespace ApiBaseClient
                 exception
                 );
 
+            // Could log here rather than throwing exception as in original example but probably best to fail fast.
+            //_logger.LogError(apiException, info);
             throw apiException;
         }
 

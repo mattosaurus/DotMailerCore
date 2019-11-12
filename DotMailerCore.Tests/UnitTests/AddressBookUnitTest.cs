@@ -13,7 +13,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task CreateAddressBook_ReturnsAnAddressBookResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var addressBook = TestFactory.GetAddressBook();
 
             // Act
@@ -27,7 +27,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task DeleteAddressBook()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var addressBookId = TestFactory.GetAddressBookId();
 
             // Act
@@ -38,7 +38,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task UpdateAddressBook_ReturnsAnAddressBookResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var addressBook = TestFactory.GetAddressBook();
 
             // Act
@@ -53,7 +53,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetAddressBook_ReturnsAnAddressBookResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
             var id = TestFactory.GetAddressBookId();
 
             // Act
@@ -68,7 +68,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetAddressBooks_ReturnsAnAddressBooksResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
 
             // Act
             var response = await client.GetAddressBooksAsync();
@@ -81,7 +81,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetPrivateAddressBooks_ReturnsAPrivateAddressBooksResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
 
             // Act
             var response = await client.GetPrivateAddressBooksAsync();
@@ -95,7 +95,7 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetPrivateAddressBooks_ReturnsAPublicAddressBooksResponse()
         {
             // Arrange
-            var client = TestFactory.GetClient();
+            var client = TestFactory.CreateClient();
 
             // Act
             var response = await client.GetPublicAddressBooksAsync();
