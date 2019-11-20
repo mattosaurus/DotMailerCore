@@ -8,32 +8,123 @@ using DotMailerCore.Tests.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Moq;
+using Newtonsoft.Json;
+using RestSharp;
 using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace DotMailerCore.Tests
 {
     public class TestFactory
     {
-        public static DotMailerCoreClient CreateClient()
+        private static readonly NewtonsoftJsonRestSerializer _jsonSerializer = new NewtonsoftJsonRestSerializer();
+        private static readonly InMemoryCache _inMemoryCache = new InMemoryCache();
+        private static readonly NullLoggerFactory _nullLoggerFactory = new NullLoggerFactory();
+
+        public static DotMailerCoreClient CreateDotMailerCoreClient()
         {
             IOptions<DotMailerCoreOptions> options = Options.Create<DotMailerCoreOptions>(new DotMailerCoreOptions()
-                {
-                    BaseUrl = "https://api.dotmailer.com/v2/",
-                    Authenticator = new HttpBasicAuthenticator("demo@apiconnector.com", "demo")
-                }
+            {
+                BaseUrl = "https://api.dotmailer.com/v2/",
+                Authenticator = new HttpBasicAuthenticator("demo@apiconnector.com", "demo")
+            }
             );
 
             NewtonsoftJsonRestSerializer jsonSerializer = new NewtonsoftJsonRestSerializer();
             InMemoryCache inMemoryCache = new InMemoryCache();
             NullLoggerFactory nullLoggerFactory = new NullLoggerFactory();
+            IEnumerable<string> contentTypes = new List<string>()
+            {
+                "application/json",
+                "text/json",
+                "text/x-json"
+            };
 
-            DotMailerCoreClient dotMailerCoreClient = new DotMailerCoreClient(inMemoryCache, jsonSerializer, jsonSerializer, options, nullLoggerFactory);
+            DotMailerCoreClient dotMailerCoreClient = new DotMailerCoreClient(inMemoryCache, contentTypes, jsonSerializer, jsonSerializer, options, nullLoggerFactory);
 
             return dotMailerCoreClient;
         }
+
+        public static Mock<IBaseClient> CreateMockBaseClient(IRestResponse restResponse)
+        {
+            var mockBaseClient = new Mock<IBaseClient>();
+            mockBaseClient.Setup(baseClient => baseClient.MakeRequestAsync(It.IsAny<RestRequest>())).Returns(Task.FromResult(restResponse));
+
+            return mockBaseClient;
+        }
+
+        public static DotMailerCoreClient CreateDotMailerCoreClientWithResponse(IRestResponse restResponse)
+        {
+            BaseClient baseClient = CreateBaseClientWithResponse(restResponse);
+            DotMailerCoreClient dotMailerCoreClient = new DotMailerCoreClient(baseClient, _jsonSerializer, _nullLoggerFactory);
+
+            return dotMailerCoreClient;
+        }
+
+        public static DotMailerCoreClient CreateDotMailerCoreClientWithResponse<T>(IRestResponse restResponse)
+        {
+            BaseClient baseClient = CreateBaseClientWithResponse<T>(restResponse);
+            DotMailerCoreClient dotMailerCoreClient = new DotMailerCoreClient(baseClient, _jsonSerializer, _nullLoggerFactory);
+
+            return dotMailerCoreClient;
+        }
+
+        public static BaseClient CreateBaseClientWithResponse(IRestResponse restResponse)
+        {
+            Mock<IRestClient> mockRestClient = CreateMockRestClient(restResponse);
+            InMemoryCache inMemoryCache = new InMemoryCache();
+            NullLoggerFactory nullLoggerFactory = new NullLoggerFactory();
+
+            BaseClient baseClient = new BaseClient(mockRestClient.Object, inMemoryCache, nullLoggerFactory);
+
+            return baseClient;
+        }
+
+        public static BaseClient CreateBaseClientWithResponse<T>(IRestResponse restResponse)
+        {
+            Mock<IRestClient> mockRestClient = CreateMockRestClient<T>(restResponse);
+            InMemoryCache inMemoryCache = new InMemoryCache();
+            NullLoggerFactory nullLoggerFactory = new NullLoggerFactory();
+
+            BaseClient baseClient = new BaseClient(mockRestClient.Object, inMemoryCache, nullLoggerFactory);
+
+            return baseClient;
+        }
+
+        public static Mock<IRestClient> CreateMockRestClient<T>(IRestResponse restResponse)
+        {
+            var mockRestClient = new Mock<IRestClient>();
+            NewtonsoftJsonRestSerializer jsonSerializer = new NewtonsoftJsonRestSerializer();
+            mockRestClient.Setup(client => client.ExecuteTaskAsync<T>(It.IsAny<IRestRequest>())).ReturnsAsync(restResponse as IRestResponse<T>);
+
+            return mockRestClient;
+        }
+
+        public static Mock<IRestClient> CreateMockRestClient(IRestResponse restResponse)
+        {
+            var mockRestClient = new Mock<IRestClient>();
+            NewtonsoftJsonRestSerializer jsonSerializer = new NewtonsoftJsonRestSerializer();
+            mockRestClient.Setup(client => client.ExecuteTaskAsync(It.IsAny<IRestRequest>())).ReturnsAsync(restResponse as IRestResponse);
+
+            return mockRestClient;
+        }
+
+        //public static Mock<IDotMailerCoreClient> CreateMockClient(IRestResponse restResponse)
+        //{
+        //    var mockDotMailerCoreClient = new Mock<IDotMailerCoreClient>() { CallBase = true };
+        //    var mockBaseClient = mockDotMailerCoreClient.As<IBaseClient>();
+        //    var mockRestClient = mockBaseClient.As<IRestClient>();
+
+        //    mockRestClient.Setup(restClient => restClient.ExecuteTaskAsync(It.IsAny<RestRequest>())).Returns(Task.FromResult(restResponse));
+
+        //    return mockDotMailerCoreClient;
+        //}
 
         public static ILogger CreateLogger(LoggerTypes type = LoggerTypes.Null)
         {
@@ -49,6 +140,34 @@ namespace DotMailerCore.Tests
             }
 
             return logger;
+        }
+
+        public static Mock<IRestResponse<T>> CreateMockRestResponse<T>(string content, HttpStatusCode httpStatusCode = HttpStatusCode.OK)
+        {
+            Mock<IRestResponse<T>> mockRestResponse = new Mock<IRestResponse<T>>();
+            mockRestResponse.Setup(x => x.StatusCode).Returns(httpStatusCode);
+            mockRestResponse.Setup(x => x.IsSuccessful).Returns(true);
+            mockRestResponse.Setup(x => x.Content).Returns(content);
+            mockRestResponse.Setup(x => x.Data).Returns(_jsonSerializer.Deserialize<T>(mockRestResponse.Object));
+
+            return mockRestResponse;
+        }
+
+        public static Mock<IRestResponse> CreateMockRestResponse(HttpStatusCode httpStatusCode = HttpStatusCode.OK)
+        {
+            Mock<IRestResponse> mockRestResponse = new Mock<IRestResponse>();
+            mockRestResponse.Setup(x => x.StatusCode).Returns(httpStatusCode);
+            mockRestResponse.Setup(x => x.IsSuccessful).Returns(true);
+
+            return mockRestResponse;
+        }
+
+        public static RestResponse GetEmptyRecycleBinRestResponse()
+        {
+            return new RestResponse()
+            {
+                StatusCode = HttpStatusCode.OK
+            };
         }
 
         public static AddressBook GetAddressBook()
