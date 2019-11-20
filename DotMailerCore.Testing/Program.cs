@@ -111,7 +111,7 @@ namespace DotMailerCore.Testing
 
             // Add json deserialization service
             serviceCollection.AddSingleton<IDeserializer, NewtonsoftJsonRestSerializer>();
-            // Add json deserialization service
+            // Add json serialization service
             serviceCollection.AddSingleton<IRestSerializer, NewtonsoftJsonRestSerializer>();
 
             // Add client

@@ -55,5 +55,13 @@ namespace ApiBaseClient
         /// <param name="cacheKey">Unique key for cache storage/retrival</param>
         /// <param name="cacheMinutes">Length of time response is cached for</param>
         Task<T> MakeRequestFromCacheAsync<T>(IRestRequest request, string cacheKey, int cacheMinutes = 30) where T : class, new();
+
+        IRestResponse Execute(IRestRequest request);
+
+        IRestResponse<T> Execute<T>(IRestRequest request);
+
+        Task<IRestResponse> ExecuteTaskAsync(IRestRequest request);
+
+        Task<IRestResponse<T>> ExecuteTaskAsync<T>(IRestRequest request);
     }
 }

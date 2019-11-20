@@ -10,20 +10,22 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetAccountInformation_ReturnsAnAccountResponse()
         {
             // Arrange
-            var client = TestFactory.CreateClient();
+            var mockRestResponse = TestFactory.CreateMockRestResponse<Account>(Constants.AccountInformationContent);
+            var client = TestFactory.CreateDotMailerCoreClientWithResponse<Account>(mockRestResponse.Object);
 
             // Act
-            var response = await client.GetAccountInformationAsync();
+            var baseResponse = await client.GetAccountInformationAsync();
 
             // Assert
-            var model = Assert.IsAssignableFrom<Account>(response);
+            var model = Assert.IsAssignableFrom<Account>(baseResponse);
         }
 
         [Fact]
         public async Task EmptyRecycleBin()
         {
             // Arrange
-            var client = TestFactory.CreateClient();
+            var mockRestResponse = TestFactory.CreateMockRestResponse();
+            var client = TestFactory.CreateDotMailerCoreClientWithResponse(mockRestResponse.Object);
 
             // Act
             await client.EmptyRecycleBinAsync();

@@ -1,4 +1,5 @@
-﻿using DotMailerCore.Models;
+﻿using ApiBaseClient;
+using DotMailerCore.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;

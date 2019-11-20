@@ -13,42 +13,59 @@ namespace ApiBaseClient
         /// <summary>
         /// HTTP status code
         /// </summary>
-        public int Status { get; }
+        public int HttpStatus { get; }
 
         /// <summary>
-        /// More info if any was provided
+        /// URI request was made to
         /// </summary>
-        public string MoreInfo { get; }
+        public string RequestUri { get; }
 
         /// <summary>
-        /// Create a ApiException with message
+        /// Method type of request
         /// </summary>
-        /// <param name="message">Exception message</param>
-        public ApiException(string message) : base (message) { }
+        public string RequestMethod { get; }
 
         /// <summary>
-        /// Create an ApiException from another Exception
+        /// Parameters of request
         /// </summary>
-        /// <param name="message">Exception message</param>
-        /// <param name="exception">Exception to copy detatils from</param>
-        public ApiException(string message, Exception exception) : base(message, exception) { }
+        public string RequestParameters { get; }
 
         /// <summary>
-        /// Create an ApiException
+        /// Returned response body
         /// </summary>
-        /// <param name="status">HTTP status code</param>
-        /// <param name="message">Error message</param>
-        /// <param name="moreInfo">More info if provided</param>
-        /// <param name="exception">Original exception</param>
+        public string ResponseContent { get; }
+
         public ApiException(
-            int status,
+            int httpStatus,
+            string requestUri,
+            string requestMethod,
+            string requestParameters,
+            string responseContent,
             string message,
-            string moreInfo,
-            Exception exception = null
-        ) : base(message, exception)
+            Exception exception
+            ) : base(message, exception)
         {
-            Status = status;
-            MoreInfo = moreInfo;
+            HttpStatus = httpStatus;
+            RequestUri = requestUri;
+            RequestMethod = requestMethod;
+            RequestParameters = requestParameters;
+            ResponseContent = responseContent;
+        }
+
+        public ApiException(
+            int httpStatus,
+            string requestUri,
+            string requestMethod,
+            string requestParameters,
+            string responseContent,
+            string message
+            ) : base(message)
+        {
+            HttpStatus = httpStatus;
+            RequestUri = requestUri;
+            RequestMethod = requestMethod;
+            RequestParameters = requestParameters;
+            ResponseContent = responseContent;
         }
     }
 }

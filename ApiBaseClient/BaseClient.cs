@@ -16,20 +16,34 @@ namespace ApiBaseClient
 {
     // Based on ultimate RestSharp client
     // https://exceptionnotfound.net/building-the-ultimate-restsharp-client-in-asp-net-and-csharp/
-    public class BaseClient : RestSharp.RestClient, IBaseClient
+    public class BaseClient : IBaseClient
     {
         protected ICacheService _cache;
         private readonly ILogger _logger;
+        private readonly IRestClient _restClient;
 
-        public BaseClient(string baseUrl, ICacheService cache, IDeserializer deserializer, IAuthenticator authenticator, ILoggerFactory loggerFactory)
+        public BaseClient(string baseUrl, ICacheService cache, IEnumerable<string> contentTypes, IDeserializer deserializer, IAuthenticator authenticator, ILoggerFactory loggerFactory)
         {
             _cache = cache;
             _logger = loggerFactory.CreateLogger<BaseClient>();
-            AddHandler("application/json", () => deserializer);
-            AddHandler("text/json", () => deserializer);
-            AddHandler("text/x-json", () => deserializer);
-            BaseUrl = new Uri(baseUrl);
-            Authenticator = authenticator;
+
+            _restClient = new RestClient()
+            {
+                BaseUrl = new Uri(baseUrl),
+                Authenticator = authenticator
+            };
+
+            foreach (string contentType in contentTypes)
+            {
+                _restClient.AddHandler(contentType, () => deserializer);
+            }
+        }
+
+        public BaseClient(IRestClient restClient, ICacheService cache, ILoggerFactory loggerFactory)
+        {
+            _cache = cache;
+            _logger = loggerFactory.CreateLogger<BaseClient>();
+            _restClient = restClient;
         }
 
         private void ThrowException(Uri BaseUrl, IRestRequest request, IRestResponse response)
@@ -42,23 +56,30 @@ namespace ApiBaseClient
                 + parameters + ", and content: " + response.Content;
 
             //Acquire the actual exception
-            Exception exception;
+            ApiException apiException;
             if (response != null && response.ErrorException != null)
             {
-                exception = response.ErrorException;
+                apiException = new ApiException(
+                                (int)response.StatusCode,
+                                BaseUrl.AbsoluteUri + request.Resource,
+                                request.Method.ToString(),
+                                string.Join(", ", request.Parameters.Select(x => x.Name.ToString() + "=" + ((x.Value == null) ? "NULL" : x.Value)).ToArray()),
+                                response.Content,
+                                info,
+                                response.ErrorException
+                                );
             }
             else
             {
-                exception = new Exception(info);
-                info = string.Empty;
+                apiException = new ApiException(
+                                (int)response.StatusCode,
+                                BaseUrl.AbsoluteUri + request.Resource,
+                                request.Method.ToString(),
+                                string.Join(", ", request.Parameters.Select(x => x.Name.ToString() + "=" + ((x.Value == null) ? "NULL" : x.Value)).ToArray()),
+                                response.Content,
+                                info
+                                );
             }
-
-            ApiException apiException = new ApiException(
-                (int)response.StatusCode,
-                exception.Message,
-                info,
-                exception
-                );
 
             // Could log here rather than throwing exception as in original example but probably best to fail fast.
             //_logger.LogError(apiException, info);
@@ -69,7 +90,7 @@ namespace ApiBaseClient
         {
             if (response.StatusCode == 0)
             {
-                ThrowException(BaseUrl, request, response);
+                ThrowException(_restClient.BaseUrl, request, response);
                 return true;
             }
             else
@@ -78,56 +99,38 @@ namespace ApiBaseClient
             }
         }
 
-        public override IRestResponse Execute(IRestRequest request)
+        public IRestResponse Execute(IRestRequest request)
         {
-            var response = base.Execute(request);
+            return ExecuteTaskAsync(request).Result;
+        }
 
+        public IRestResponse<T> Execute<T>(IRestRequest request)
+        {
+            return ExecuteTaskAsync<T>(request).Result;
+        }
+
+        public async Task<IRestResponse> ExecuteTaskAsync(IRestRequest request)
+        {
+            var response = await _restClient.ExecuteTaskAsync(request);
             TimeoutCheck(request, response);
             return response;
         }
 
-        public override IRestResponse<T> Execute<T>(IRestRequest request)
+        public async Task<IRestResponse<T>> ExecuteTaskAsync<T>(IRestRequest request)
         {
-            var response = base.Execute<T>(request);
-            TimeoutCheck(request, response);
-            return response;
-        }
-
-        public async override Task<IRestResponse> ExecuteTaskAsync(IRestRequest request)
-        {
-            var response = await base.ExecuteTaskAsync(request);
-            TimeoutCheck(request, response);
-            return response;
-        }
-
-        public async override Task<IRestResponse<T>> ExecuteTaskAsync<T>(IRestRequest request)
-        {
-            var response = await base.ExecuteTaskAsync<T>(request);
+            var response = await _restClient.ExecuteTaskAsync<T>(request);
             TimeoutCheck(request, response);
             return response;
         }
 
         public T MakeRequest<T>(IRestRequest request) where T : new()
         {
-            var response = Execute<T>(request);
-            if (response.IsSuccessful)
-            {
-                return response.Data;
-            }
-            else
-            {
-                ThrowException(BaseUrl, request, response);
-                return default(T);
-            }
+            return MakeRequestAsync<T>(request).Result;
         }
 
         public void MakeRequest(IRestRequest request)
         {
-            var response = Execute(request);
-            if (!response.IsSuccessful)
-            {
-                ThrowException(BaseUrl, request, response);
-            }
+            MakeRequestAsync(request).Wait();
         }
 
         public async Task<T> MakeRequestAsync<T>(IRestRequest request) where T : new()
@@ -139,7 +142,7 @@ namespace ApiBaseClient
             }
             else
             {
-                ThrowException(BaseUrl, request, response);
+                ThrowException(_restClient.BaseUrl, request, response);
                 return default(T);
             }
         }
@@ -149,28 +152,13 @@ namespace ApiBaseClient
             var response = await ExecuteTaskAsync(request);
             if (!response.IsSuccessful)
             {
-                ThrowException(BaseUrl, request, response);
+                ThrowException(_restClient.BaseUrl, request, response);
             }
         }
 
         public T MakeRequestFromCache<T>(IRestRequest request, string cacheKey, int cacheMinutes = 30) where T : class, new()
         {
-            var item = _cache.Get<T>(cacheKey);
-            if (item == null) //If the cache doesn't have the item
-            {
-                var response = Execute<T>(request); //Get the item from the API call
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    _cache.Set(cacheKey, response.Data, cacheMinutes); //Set that item into the cache so we can get it next time
-                    item = response.Data;
-                }
-                else
-                {
-                    ThrowException(BaseUrl, request, response);
-                    return default(T);
-                }
-            }
-            return item;
+            return MakeRequestFromCacheAsync<T>(request, cacheKey, cacheMinutes).Result;
         }
 
         public async Task<T> MakeRequestFromCacheAsync<T>(IRestRequest request, string cacheKey, int cacheMinutes = 30) where T : class, new()
@@ -186,8 +174,7 @@ namespace ApiBaseClient
                 }
                 else
                 {
-                    ThrowException(BaseUrl, request, response);
-                    return default(T);
+                    ThrowException(_restClient.BaseUrl, request, response);
                 }
             }
             return item;

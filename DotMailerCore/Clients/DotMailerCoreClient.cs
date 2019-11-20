@@ -14,14 +14,21 @@ using System.Threading.Tasks;
 
 namespace DotMailerCore
 {
-    public class DotMailerCoreClient : BaseClient, IDotMailerCoreClient
+    public class DotMailerCoreClient : IDotMailerCoreClient
     {
         private readonly IRestSerializer _serializer;
+        private readonly IBaseClient _baseClient;
 
-        public DotMailerCoreClient(ICacheService cache, IDeserializer deserializer, IRestSerializer serializer, IOptions<DotMailerCoreOptions> options, ILoggerFactory loggerFactory)
-            : base(options.Value.BaseUrl, cache, deserializer, options.Value.Authenticator, loggerFactory)
+        public DotMailerCoreClient(ICacheService cache, IEnumerable<string> contentTypes, IDeserializer deserializer, IRestSerializer serializer, IOptions<DotMailerCoreOptions> options, ILoggerFactory loggerFactory)
         {
             _serializer = serializer;
+            _baseClient = new BaseClient(options.Value.BaseUrl, cache, contentTypes, deserializer, options.Value.Authenticator, loggerFactory);
+        }
+
+        public DotMailerCoreClient(IBaseClient baseClient, IRestSerializer serializer, ILoggerFactory loggerFactory)
+        {
+            _serializer = serializer;
+            _baseClient = baseClient;
         }
 
         #region Account
@@ -32,7 +39,7 @@ namespace DotMailerCore
         public async Task<Account> GetAccountInformationAsync()
         {
             var request = new RestRequest("account-info") { JsonSerializer = _serializer };
-            return await MakeRequestAsync<Account>(request);
+            return await _baseClient.MakeRequestAsync<Account>(request);
         }
 
         /// <summary>
@@ -41,7 +48,7 @@ namespace DotMailerCore
         public async Task EmptyRecycleBinAsync()
         {
             var request = new RestRequest("accounts/empty-recycle-bin/", Method.POST) { JsonSerializer = _serializer };
-            await MakeRequestAsync(request);
+            await _baseClient.MakeRequestAsync(request);
         }
 
         #endregion
@@ -56,7 +63,7 @@ namespace DotMailerCore
             var request = new RestRequest("/address-books", Method.POST) { JsonSerializer = _serializer };
             request.AddJsonBody(addressBook);
 
-            return await MakeRequestAsync<AddressBook>(request);
+            return await _baseClient.MakeRequestAsync<AddressBook>(request);
         }
 
         /// <summary>
@@ -67,7 +74,7 @@ namespace DotMailerCore
             var request = new RestRequest("/address-books/{id}", Method.DELETE) { JsonSerializer = _serializer };
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
-            await MakeRequestAsync(request);
+            await _baseClient.MakeRequestAsync(request);
         }
 
         /// <summary>
@@ -81,7 +88,7 @@ namespace DotMailerCore
             request.AddParameter("id", addressBook.Id, ParameterType.UrlSegment);
             request.AddJsonBody(addressBook);
 
-            return await MakeRequestAsync<AddressBook>(request);
+            return await _baseClient.MakeRequestAsync<AddressBook>(request);
         }
 
         /// <summary>
@@ -94,7 +101,7 @@ namespace DotMailerCore
             var request = new RestRequest("/address-books/{id}") { JsonSerializer = _serializer };
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
-            return await MakeRequestAsync<AddressBook>(request);
+            return await _baseClient.MakeRequestAsync<AddressBook>(request);
         }
 
         /// <summary>
@@ -109,7 +116,7 @@ namespace DotMailerCore
             request.AddParameter("select", select, ParameterType.QueryString);
             request.AddParameter("skip", skip, ParameterType.QueryString);
 
-            return await MakeRequestAsync<List<AddressBook>>(request);
+            return await _baseClient.MakeRequestAsync<List<AddressBook>>(request);
         }
 
         /// <summary>
@@ -124,7 +131,7 @@ namespace DotMailerCore
             request.AddParameter("select", select, ParameterType.QueryString);
             request.AddParameter("skip", skip, ParameterType.QueryString);
 
-            return await MakeRequestAsync<List<AddressBook>>(request);
+            return await _baseClient.MakeRequestAsync<List<AddressBook>>(request);
         }
 
         /// <summary>
@@ -139,7 +146,7 @@ namespace DotMailerCore
             request.AddParameter("select", select, ParameterType.QueryString);
             request.AddParameter("skip", skip, ParameterType.QueryString);
 
-            return await MakeRequestAsync<List<AddressBook>>(request);
+            return await _baseClient.MakeRequestAsync<List<AddressBook>>(request);
         }
 
         #endregion
@@ -156,7 +163,7 @@ namespace DotMailerCore
             var request = new RestRequest("/campaigns", Method.POST) { JsonSerializer = _serializer };
             request.AddJsonBody(campaign);
 
-            return await MakeRequestAsync<Campaign>(request);
+            return await _baseClient.MakeRequestAsync<Campaign>(request);
         }
 
         /// <summary>
@@ -169,7 +176,7 @@ namespace DotMailerCore
             var request = new RestRequest("/campaigns/split-test", Method.POST) { JsonSerializer = _serializer };
             request.AddJsonBody(splitTestCampaign);
 
-            return await MakeRequestAsync<SplitTestCampaign>(request);
+            return await _baseClient.MakeRequestAsync<SplitTestCampaign>(request);
         }
 
         /// <summary>
@@ -183,7 +190,7 @@ namespace DotMailerCore
             request.AddParameter("id", campaign.Id, ParameterType.UrlSegment);
             request.AddJsonBody(campaign);
 
-            return await MakeRequestAsync<Campaign>(request);
+            return await _baseClient.MakeRequestAsync<Campaign>(request);
         }
 
         /// <summary>
@@ -196,7 +203,7 @@ namespace DotMailerCore
             var request = new RestRequest("/campaigns/{id}/copy", Method.POST) { JsonSerializer = _serializer };
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
-            return await MakeRequestAsync<Campaign>(request);
+            return await _baseClient.MakeRequestAsync<Campaign>(request);
         }
 
         /// <summary>
@@ -209,7 +216,7 @@ namespace DotMailerCore
             var request = new RestRequest("/campaigns/{id}", Method.DELETE) { JsonSerializer = _serializer };
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
-            await MakeRequestAsync(request);
+            await _baseClient.MakeRequestAsync(request);
         }
 
         /// <summary>
@@ -222,7 +229,7 @@ namespace DotMailerCore
             var request = new RestRequest("/campaigns/send", Method.POST) { JsonSerializer = _serializer };
             request.AddJsonBody(campaignSend);
 
-            return await MakeRequestAsync<CampaignSend>(request);
+            return await _baseClient.MakeRequestAsync<CampaignSend>(request);
         }
 
         /// <summary>
@@ -235,7 +242,7 @@ namespace DotMailerCore
             var request = new RestRequest("/campaigns/send-time-optimised", Method.POST) { JsonSerializer = _serializer };
             request.AddJsonBody(campaignSend);
 
-            return await MakeRequestAsync<CampaignSend>(request);
+            return await _baseClient.MakeRequestAsync<CampaignSend>(request);
         }
 
         /// <summary>
@@ -248,7 +255,7 @@ namespace DotMailerCore
             var request = new RestRequest("/campaigns/send/{id}") { JsonSerializer = _serializer };
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
-            return await MakeRequestAsync<CampaignSend>(request);
+            return await _baseClient.MakeRequestAsync<CampaignSend>(request);
         }
 
         /// <summary>
@@ -263,7 +270,7 @@ namespace DotMailerCore
             request.AddParameter("id", id, ParameterType.UrlSegment);
             request.AddJsonBody(attatchment);
 
-            return await MakeRequestAsync<Attatchment>(request);
+            return await _baseClient.MakeRequestAsync<Attatchment>(request);
         }
 
         /// <summary>
@@ -278,7 +285,7 @@ namespace DotMailerCore
             request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
             request.AddParameter("documentId", documentId, ParameterType.UrlSegment);
 
-            await MakeRequestAsync(request);
+            await _baseClient.MakeRequestAsync(request);
         }
 
         /// <summary>
@@ -291,7 +298,7 @@ namespace DotMailerCore
             var request = new RestRequest("/campaigns/{campaignId}/attachments") { JsonSerializer = _serializer };
             request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
 
-            return await MakeRequestAsync<List<Attatchment>>(request);
+            return await _baseClient.MakeRequestAsync<List<Attatchment>>(request);
         }
 
         /// <summary>
@@ -306,7 +313,7 @@ namespace DotMailerCore
             request.AddParameter("select", select, ParameterType.QueryString);
             request.AddParameter("skip", skip, ParameterType.QueryString);
 
-            return await MakeRequestAsync<List<Campaign>>(request);
+            return await _baseClient.MakeRequestAsync<List<Campaign>>(request);
         }
 
         /// <summary>
@@ -323,7 +330,7 @@ namespace DotMailerCore
             request.AddParameter("select", select, ParameterType.QueryString);
             request.AddParameter("skip", skip, ParameterType.QueryString);
 
-            return await MakeRequestAsync<List<Campaign>>(request);
+            return await _baseClient.MakeRequestAsync<List<Campaign>>(request);
         }
 
         /// <summary>
@@ -340,7 +347,7 @@ namespace DotMailerCore
             request.AddParameter("select", select, ParameterType.QueryString);
             request.AddParameter("skip", skip, ParameterType.QueryString);
 
-            return await MakeRequestAsync<List<Campaign>>(request);
+            return await _baseClient.MakeRequestAsync<List<Campaign>>(request);
         }
 
         /// <summary>
@@ -353,7 +360,7 @@ namespace DotMailerCore
             var request = new RestRequest("/campaigns/{campaignId}") { JsonSerializer = _serializer };
             request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
 
-            return await MakeRequestAsync<Campaign>(request);
+            return await _baseClient.MakeRequestAsync<Campaign>(request);
         }
 
         /// <summary>
@@ -366,7 +373,7 @@ namespace DotMailerCore
             var request = new RestRequest("/campaigns/{campaignId}/with-details") { JsonSerializer = _serializer };
             request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
 
-            return await MakeRequestAsync<Campaign>(request);
+            return await _baseClient.MakeRequestAsync<Campaign>(request);
         }
 
         public async Task<CampaignSummary> GetCampaignSummaryAsync(int campaignId)
@@ -374,7 +381,7 @@ namespace DotMailerCore
             var request = new RestRequest("/campaigns/{campaignId}/summary") { JsonSerializer = _serializer };
             request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
 
-            return await MakeRequestAsync<CampaignSummary>(request);
+            return await _baseClient.MakeRequestAsync<CampaignSummary>(request);
         }
 
         #endregion

@@ -13,7 +13,8 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task CreateAddressBook_ReturnsAnAddressBookResponse()
         {
             // Arrange
-            var client = TestFactory.CreateClient();
+            var mockRestResponse = TestFactory.CreateMockRestResponse<AddressBook>(Constants.AddressBookCreateContent);
+            var client = TestFactory.CreateDotMailerCoreClientWithResponse<AddressBook>(mockRestResponse.Object);
             var addressBook = TestFactory.GetAddressBook();
 
             // Act
@@ -27,7 +28,8 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task DeleteAddressBook()
         {
             // Arrange
-            var client = TestFactory.CreateClient();
+            var mockRestResponse = TestFactory.CreateMockRestResponse();
+            var client = TestFactory.CreateDotMailerCoreClientWithResponse(mockRestResponse.Object);
             var addressBookId = TestFactory.GetAddressBookId();
 
             // Act
@@ -38,7 +40,8 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task UpdateAddressBook_ReturnsAnAddressBookResponse()
         {
             // Arrange
-            var client = TestFactory.CreateClient();
+            var mockRestResponse = TestFactory.CreateMockRestResponse<AddressBook>(Constants.AddressBookUpdateContent);
+            var client = TestFactory.CreateDotMailerCoreClientWithResponse<AddressBook>(mockRestResponse.Object);
             var addressBook = TestFactory.GetAddressBook();
 
             // Act
@@ -53,7 +56,8 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetAddressBook_ReturnsAnAddressBookResponse()
         {
             // Arrange
-            var client = TestFactory.CreateClient();
+            var mockRestResponse = TestFactory.CreateMockRestResponse<AddressBook>(Constants.AddressBookContent);
+            var client = TestFactory.CreateDotMailerCoreClientWithResponse<AddressBook>(mockRestResponse.Object);
             var id = TestFactory.GetAddressBookId();
 
             // Act
@@ -68,7 +72,8 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetAddressBooks_ReturnsAnAddressBooksResponse()
         {
             // Arrange
-            var client = TestFactory.CreateClient();
+            var mockRestResponse = TestFactory.CreateMockRestResponse<List<AddressBook>>(Constants.AddressBooksContent);
+            var client = TestFactory.CreateDotMailerCoreClientWithResponse<List<AddressBook>>(mockRestResponse.Object);
 
             // Act
             var response = await client.GetAddressBooksAsync();
@@ -81,7 +86,8 @@ namespace DotMailerCore.Tests.UnitTests
         public async Task GetPrivateAddressBooks_ReturnsAPrivateAddressBooksResponse()
         {
             // Arrange
-            var client = TestFactory.CreateClient();
+            var mockRestResponse = TestFactory.CreateMockRestResponse<List<AddressBook>>(Constants.AddressBooksPrivateContent);
+            var client = TestFactory.CreateDotMailerCoreClientWithResponse<List<AddressBook>>(mockRestResponse.Object);
 
             // Act
             var response = await client.GetPrivateAddressBooksAsync();
@@ -92,10 +98,11 @@ namespace DotMailerCore.Tests.UnitTests
         }
 
         [Fact]
-        public async Task GetPrivateAddressBooks_ReturnsAPublicAddressBooksResponse()
+        public async Task GetPublicAddressBooks_ReturnsAPublicAddressBooksResponse()
         {
             // Arrange
-            var client = TestFactory.CreateClient();
+            var mockRestResponse = TestFactory.CreateMockRestResponse<List<AddressBook>>(Constants.AddressBooksPublicContent);
+            var client = TestFactory.CreateDotMailerCoreClientWithResponse<List<AddressBook>>(mockRestResponse.Object);
 
             // Act
             var response = await client.GetPublicAddressBooksAsync();
