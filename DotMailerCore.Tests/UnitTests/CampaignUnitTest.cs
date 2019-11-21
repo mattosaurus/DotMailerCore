@@ -87,8 +87,6 @@ namespace DotMailerCore.Tests.UnitTests
             await client.DeleteCampaignAsync(campaignId);
         }
 
-
-
         [Fact]
         public async Task SendCampaign_ReturnsACampaignSendResponse()
         {

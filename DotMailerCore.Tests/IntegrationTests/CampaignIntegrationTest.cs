@@ -1,6 +1,8 @@
-﻿using DotMailerCore.Models;
+﻿using ApiBaseClient;
+using DotMailerCore.Models;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -79,6 +81,34 @@ namespace DotMailerCore.Tests.IntegrationTests
         }
 
         [Fact]
+        public async Task SendCampaign_ReturnsACampaignSendResponse()
+        {
+            // Arrange
+            var client = TestFactory.CreateDotMailerCoreClient();
+            var campaignSend = TestFactory.GetCampaignSend();
+
+            // Act
+            var response = await client.SendCampaignAsync(campaignSend);
+
+            // Assert
+            var model = Assert.IsAssignableFrom<CampaignSend>(response);
+        }
+
+        [Fact]
+        public async Task SendTimeOptimisedCampaign_ReturnsAnErrorResponse()
+        {
+            // Arrange
+            var campaignSend = TestFactory.GetCampaignSend();
+            var client = TestFactory.CreateDotMailerCoreClient();
+
+            // Act
+            var response = await client.SendTimeOptimisedCampaignAsync(campaignSend);
+
+            // Assert
+            var model = Assert.IsAssignableFrom<CampaignSend>(response);
+        }
+
+        [Fact]
         public async Task GetCampaignSendStatus_ReturnsACampaignSendStatusResponse()
         {
             // Arrange
@@ -90,6 +120,53 @@ namespace DotMailerCore.Tests.IntegrationTests
 
             // Assert
             var model = Assert.IsAssignableFrom<CampaignSend>(response);
+        }
+
+        [Fact]
+        public async Task AddCampaignAttachment_ReturnsAnErrorResponse()
+        {
+            // Arrange
+            var campaignId = TestFactory.GetCampaignId();
+            var attatchment = TestFactory.GetCampaignAttatchment();
+            var client = TestFactory.CreateDotMailerCoreClient();
+
+            // Act
+            var ex = await Assert.ThrowsAsync<ApiException>(() => client.AddCampaignAttachmentAsync(campaignId, attatchment));
+
+            // Assert
+            Assert.Equal((int)HttpStatusCode.Forbidden, ex.HttpStatus);
+            Assert.Contains("ERROR_FEATURENOTACTIVE", ex.ResponseContent);
+        }
+
+        [Fact]
+        public async Task RemoveCampaignAttachment_ReturnsAnErrorResponse()
+        {
+            // Arrange
+            var campaignId = TestFactory.GetCampaignId();
+            var campaignAttatchmentId = TestFactory.GetCampaignAttatchmentId();
+            var client = TestFactory.CreateDotMailerCoreClient();
+
+            // Act
+            var ex = await Assert.ThrowsAsync<ApiException>(() => client.RemoveCampaignAttachmentAsync(campaignId, campaignAttatchmentId));
+
+            // Assert
+            Assert.Equal((int)HttpStatusCode.Forbidden, ex.HttpStatus);
+            Assert.Contains("ERROR_FEATURENOTACTIVE", ex.ResponseContent);
+        }
+
+        [Fact]
+        public async Task GetCampaignAttatchments_ReturnsAnErrorResponse()
+        {
+            // Arrange
+            var campaignId = TestFactory.GetCampaignId();
+            var client = TestFactory.CreateDotMailerCoreClient();
+
+            // Act
+            var ex = await Assert.ThrowsAsync<ApiException>(() => client.GetCampaignAttachmentsAsync(campaignId));
+
+            // Assert
+            Assert.Equal((int)HttpStatusCode.Forbidden, ex.HttpStatus);
+            Assert.Contains("ERROR_FEATURENOTACTIVE", ex.ResponseContent);
         }
 
         [Fact]
