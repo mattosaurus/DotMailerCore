@@ -322,7 +322,7 @@ namespace DotMailerCore
         /// <summary>
         /// Gets any campaigns that have been sent to an address book
         /// </summary>
-        /// <param name="campaignId">The ID of the address book or segment, which needs to be included within the URL</param>
+        /// <param name="addressBookId">The ID of the address book or segment, which needs to be included within the URL</param>
         /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
         /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL</param>
         /// <returns></returns>
@@ -339,7 +339,7 @@ namespace DotMailerCore
         /// <summary>
         /// Gets any campaigns that have been sent to a segment
         /// </summary>
-        /// <param name="campaignId">The ID of the address book or segment, which needs to be included within the URL</param>
+        /// <param name="segmentId">The ID of the address book or segment, which needs to be included within the URL</param>
         /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
         /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL</param>
         /// <returns></returns>
@@ -351,6 +351,40 @@ namespace DotMailerCore
             request.AddParameter("skip", skip, ParameterType.QueryString);
 
             return await _baseClient.MakeRequestAsync<List<Campaign>>(request);
+        }
+
+        /// <summary>
+        /// Gets all sent campaigns, which have had activity (e.g. clicks, opens) after a specified date
+        /// </summary>
+        /// <param name="dateTime">The date from which campaigns with activity will be returned, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL</param>
+        /// <returns></returns>
+        public async Task<List<Campaign>> GetCampaignsWithActivityAsync(DateTime dateTime, int select, int skip)
+        {
+            var request = new RestRequest("/campaigns/with-activity-since/{dateTime}") { JsonSerializer = _serializer };
+            request.AddParameter("dateTime", dateTime.ToString("yyyy-MM-dd"), ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<Campaign>>(request);
+        }
+
+        /// <summary>
+        /// Gets any address books and segments that a campaign has ever been sent to
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL</param>
+        /// <returns></returns>
+        public async Task<List<AddressBook>> GetCampaignAddressBooksAsync(int campaignId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/address-books") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<AddressBook>>(request);
         }
 
         /// <summary>
@@ -379,12 +413,403 @@ namespace DotMailerCore
             return await _baseClient.MakeRequestAsync<Campaign>(request);
         }
 
+        /// <summary>
+        /// Gets a summary of reporting information for a specified campaign
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <returns></returns>
         public async Task<CampaignSummary> GetCampaignSummaryAsync(int campaignId)
         {
             var request = new RestRequest("/campaigns/{campaignId}/summary") { JsonSerializer = _serializer };
             request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
 
             return await _baseClient.MakeRequestAsync<CampaignSummary>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of campaign opens
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactOpen>> GetCampaignOpensAsync(int campaignId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/opens") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactOpen>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of campaign opens for a contact
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="contactId">The ID of the contact, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactOpen>> GetCampaignOpensAsync(int campaignId, int contactId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/activities/{contactId}/opens") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("contactId", contactId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactOpen>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of opens for a campaign after a specified date
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="dateTime">The date from which any opens for the campaign are returned, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactOpen>> GetCampaignOpensAsync(int campaignId, DateTime dateTime, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/opens/since-date/{dateTime}") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("dateTime", dateTime.ToString("yyyy-MM-dd"), ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactOpen>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of contacts who were sent a campaign, with their activity
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactSummary>> GetCampaignActivityAsync(int campaignId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/activities") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactSummary>>(request);
+        }
+
+        /// <summary>
+        /// Gets activity for a given contact and given campaign
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="contactId">The ID of the contact, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactSummary>> GetCampaignActivityAsync(int campaignId, int contactId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/activities/{contactId}") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("contactId", contactId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactSummary>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of contacts who were sent a campaign, and retrieves only those contacts who showed activity (e.g. they clicked, opened) after a specified date
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="dateTime">The date from which any campaign activity is returned, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactSummary>> GetCampaignActivityAsync(int campaignId, DateTime dateTime, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/activities/since-date/{dateTime}") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("dateTime", dateTime.ToString("yyyy-MM-dd"), ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactSummary>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of campaign link clicks
+        /// </summary>
+        /// <param name="campaignId"></param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactClick>> GetCampaignClicksAsync(int campaignId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/clicks") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactClick>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of campaign link clicks for a contact
+        /// </summary>
+        /// <param name="campaignId"></param>
+        /// <param name="contactId"></param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactClick>> GetCampaignClicksAsync(int campaignId, int contactId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/activities/{contactId}/clicks") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("contactId", contactId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactClick>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of link clicks for a campaign after a specified date
+        /// </summary>
+        /// <param name="campaignId"></param>
+        /// <param name="dateTime"></param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactClick>> GetCampaignClicksAsync(int campaignId, DateTime dateTime, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/clicks/since-date/{dateTime}") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("dateTime", dateTime.ToString("yyyy-MM-dd"), ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactClick>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of campaign link clicks with assigned link groups
+        /// </summary>
+        /// <param name="campaignId">This is the ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactClick>> GetCampaignClicksWithLinkGroupsAsync(int campaignId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/clicks-with-groups") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactClick>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of campaign link clicks, with assigned link groups, for a contact
+        /// </summary>
+        /// <param name="campaignId">This is the ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="contactId">This is the ID of the contact, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactClick>> GetCampaignClicksWithLinkGroupsAsync(int campaignId, int contactId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/activities/{contactId}/clicks-with-groups") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("contactId", contactId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactClick>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of link clicks for a campaign, with assigned link groups, after a specified date
+        /// </summary>
+        /// <param name="campaignId">This is the ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="dateTime">The date from which any campaign clicks are returned, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactClick>> GetCampaignClicksWithLinkGroupsAsync(int campaignId, DateTime dateTime, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/clicks-with-groups/since-date/{dateTime}") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("dateTime", dateTime.ToString("yyyy-MM-dd"), ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactClick>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of page views for a specific campaign
+        /// </summary>
+        /// <param name="campaignId"></param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactPageView>> GetCampaignPageViewsAsync(int campaignId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/page-views") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactPageView>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of page views for a specific campaign for a contact
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="contactId">The ID of the contact, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactPageView>> GetCampaignPageViewsAsync(int campaignId, int contactId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/activities/{contactId}/page-views") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("contactId", contactId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactPageView>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of page views for a campaign after a specified date
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="dateTime">The date from which any campaign page views are returned, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactPageView>> GetCampaignPageViewsAsync(int campaignId, DateTime dateTime, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/page-views/since-date/{dateTime}") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("dateTime", dateTime.ToString("yyyy-MM-dd"), ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactPageView>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of campaign replies for a contact
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="contactId">The ID of the contact, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactReply>> GetCampaignRepliesAsync(int campaignId, int contactId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/activities/{contactId}/replies") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("contactId", contactId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactReply>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of ROI information for a campaign for a contact
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="contactId">The ID of the contact, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactRoiDetail>> GetCampaignROIAsync(int campaignId, int contactId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/activities/{contactId}/roi-details") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("contactId", contactId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactRoiDetail>>(request);
+        }
+
+        /// <summary>
+        /// Retrieves a list of ROI information for a campaign after a specified date
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="dateTime">The date from which any ROI activity is returned, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactRoiDetail>> GetCampaignROIAsync(int campaignId, DateTime dateTime, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/roi-details/since-date/{dateTime}") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("dateTime", dateTime.ToString("yyyy-MM-dd"), ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactRoiDetail>>(request);
+        }
+
+        /// <summary>
+        /// Gets campaign social bookmark views for a campaign
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactSocialBookmarkView>> GetCampaignSocialBookmarkViewsAsync(int campaignId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/social-bookmark-views") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactSocialBookmarkView>>(request);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="campaignId"></param>
+        /// <param name="contactId"></param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<CampaignContactSocialBookmarkView>> GetCampaignSocialBookmarkViewsAsync(int campaignId, int contactId, int select = 1000, int skip = 0)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/activities/{contactId}/social-bookmark-views") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("contactId", contactId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<CampaignContactSocialBookmarkView>>(request);
+        }
+
+        /// <summary>
+        /// Gets a list of contacts who hard bounced when sent a particular campaign
+        /// </summary>
+        /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
+        /// <param name="select">The select parameter requires a number between 1 and 1000 (0 is not a valid number). You may only select a maximum of 1000 results in a single request. This parameter goes within the URL.</param>
+        /// <param name="skip">The skip parameter should be used in tandem with the select parameter when wanting to iterate through a whole data set. If you want to select the next 1000 records you should set the select parameter to 1000 and the skip parameter to 1000, which will return records 1001 to 2000. You should continue to do this until 0 records are returned to retrieve the whole data set. This parameter goes within the URL.</param>
+        /// <returns></returns>
+        public async Task<List<Contact>> GetCampaignHardBouncesAsync(int campaignId, int select = 1000, int skip = 0, bool withFullDate = false)
+        {
+            var request = new RestRequest("/campaigns/{campaignId}/hard-bouncing-contacts") { JsonSerializer = _serializer };
+            request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
+            request.AddParameter("select", select, ParameterType.QueryString);
+            request.AddParameter("skip", skip, ParameterType.QueryString);
+            request.AddParameter("withFullDate", withFullDate, ParameterType.QueryString);
+
+            return await _baseClient.MakeRequestAsync<List<Contact>>(request);
         }
 
         #endregion
