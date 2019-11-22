@@ -18,17 +18,20 @@ namespace DotMailerCore
     {
         private readonly IRestSerializer _serializer;
         private readonly IBaseClient _baseClient;
+        private readonly ILogger<IDotMailerCoreClient> _logger;
 
-        public DotMailerCoreClient(ICacheService cache, IEnumerable<string> contentTypes, IDeserializer deserializer, IRestSerializer serializer, IOptions<DotMailerCoreOptions> options, ILoggerFactory loggerFactory)
+        public DotMailerCoreClient(ICacheService cache, IRestSerializer serializer, IOptions<DotMailerCoreOptions> options, ILoggerFactory loggerFactory)
         {
             _serializer = serializer;
-            _baseClient = new BaseClient(options.Value.BaseUrl, cache, contentTypes, deserializer, options.Value.Authenticator, loggerFactory);
+            _baseClient = new BaseClient(options.Value.BaseUrl, cache, options.Value.ContentTypes, options.Value.Deserializer, options.Value.Authenticator, loggerFactory);
+            _logger = loggerFactory.CreateLogger<IDotMailerCoreClient>();
         }
 
         public DotMailerCoreClient(IBaseClient baseClient, IRestSerializer serializer, ILoggerFactory loggerFactory)
         {
             _serializer = serializer;
             _baseClient = baseClient;
+            _logger = loggerFactory.CreateLogger<IDotMailerCoreClient>();
         }
 
         #region Account

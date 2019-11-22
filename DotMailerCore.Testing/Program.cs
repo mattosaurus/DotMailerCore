@@ -14,6 +14,7 @@ using RestSharp.Serialization;
 using RestSharp.Serializers;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -47,22 +48,6 @@ namespace DotMailerCore.Testing
 
                 // Create service provider
                 IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
-
-                //DotMailerCoreClient dotMailerCoreClient = (DotMailerCoreClient)serviceProvider.GetService(typeof(IDotMailerCoreClient));
-
-                //CampaignSend campaignSend = new CampaignSend()
-                //{
-                //    Id = new Guid("e8224c2b-a670-461e-b060-4ec776e9e7c2"),
-                //    CampaignId = 1,
-                //    SendDate = DateTime.Parse("2015-10-31T00:00:00"),
-                //    SplitTestOptions = new SplitTestOptions()
-                //    {
-                //        TestMetric = TestMetric.Opens,
-                //        TestPercentage = 50,
-                //        TestPeriodHours = 5
-                //    }
-                //};
-                //await dotMailerCoreClient.SendCampaignAsync(campaignSend);
 
                 await serviceProvider.GetService<App>().Run();
             }
@@ -109,15 +94,12 @@ namespace DotMailerCore.Testing
             // Add cache service
             serviceCollection.AddSingleton<ICacheService, InMemoryCache>();
 
-            // Add json deserialization service
-            serviceCollection.AddSingleton<IDeserializer, NewtonsoftJsonRestSerializer>();
             // Add json serialization service
             serviceCollection.AddSingleton<IRestSerializer, NewtonsoftJsonRestSerializer>();
 
             // Add client
             serviceCollection.AddDotMailer(options =>
             {
-                options.BaseUrl = "https://api.dotmailer.com/v2/";
                 options.Authenticator = new HttpBasicAuthenticator("demo@apiconnector.com", "demo");
             });
 

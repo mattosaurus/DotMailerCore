@@ -95,7 +95,7 @@ namespace DotMailerCore.Tests.IntegrationTests
         }
 
         [Fact]
-        public async Task SendTimeOptimisedCampaign_ReturnsAnErrorResponse()
+        public async Task SendTimeOptimisedCampaign_ReturnsACampaignSendStatusResponse()
         {
             // Arrange
             var campaignSend = TestFactory.GetCampaignSend();
