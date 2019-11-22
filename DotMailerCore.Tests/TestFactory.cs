@@ -29,16 +29,7 @@ namespace DotMailerCore.Tests
 
         public static DotMailerCoreClient CreateDotMailerCoreClient()
         {
-            IOptions<DotMailerCoreOptions> options = Options.Create<DotMailerCoreOptions>(new DotMailerCoreOptions()
-            {
-                BaseUrl = "https://api.dotmailer.com/v2/",
-                Authenticator = new HttpBasicAuthenticator("demo@apiconnector.com", "demo")
-            }
-            );
-
             NewtonsoftJsonRestSerializer jsonSerializer = new NewtonsoftJsonRestSerializer();
-            InMemoryCache inMemoryCache = new InMemoryCache();
-            NullLoggerFactory nullLoggerFactory = new NullLoggerFactory();
             IEnumerable<string> contentTypes = new List<string>()
             {
                 "application/json",
@@ -46,7 +37,21 @@ namespace DotMailerCore.Tests
                 "text/x-json"
             };
 
-            DotMailerCoreClient dotMailerCoreClient = new DotMailerCoreClient(inMemoryCache, contentTypes, jsonSerializer, jsonSerializer, options, nullLoggerFactory);
+            IOptions<DotMailerCoreOptions> options = Options.Create<DotMailerCoreOptions>(new DotMailerCoreOptions()
+                {
+                    BaseUrl = "https://api.dotmailer.com/v2/",
+                    Authenticator = new HttpBasicAuthenticator("demo@apiconnector.com", "demo"),
+                    Deserializer = jsonSerializer,
+                    ContentTypes = contentTypes
+                }
+            );
+
+            
+            InMemoryCache inMemoryCache = new InMemoryCache();
+            NullLoggerFactory nullLoggerFactory = new NullLoggerFactory();
+
+
+            DotMailerCoreClient dotMailerCoreClient = new DotMailerCoreClient(inMemoryCache, jsonSerializer, options, nullLoggerFactory);
 
             return dotMailerCoreClient;
         }
