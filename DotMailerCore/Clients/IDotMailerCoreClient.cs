@@ -43,11 +43,11 @@ namespace DotMailerCore.Clients
 
         Task<CampaignSend> GetCampaignSendStatusAsync(Guid id);
 
-        Task<Attatchment> AddCampaignAttachmentAsync(int id, Attatchment attatchment);
+        Task<Attachment> AddCampaignAttachmentAsync(int id, Attachment attatchment);
 
         Task RemoveCampaignAttachmentAsync(int campaignId, int documentId);
 
-        Task<List<Attatchment>> GetCampaignAttachmentsAsync(int campaignId);
+        Task<List<Attachment>> GetCampaignAttachmentsAsync(int campaignId);
 
         Task<List<Campaign>> GetCampaignsAsync(int select, int skip);
 

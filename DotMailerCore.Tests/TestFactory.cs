@@ -386,9 +386,9 @@ namespace DotMailerCore.Tests
             return new Guid("e8224c2b-a670-461e-b060-4ec776e9e7c2");
         }
 
-        public static Attatchment GetCampaignAttatchment()
+        public static Attachment GetCampaignAttatchment()
         {
-            return new Attatchment()
+            return new Attachment()
             {
                 Id = 3,
                 Name = "Directions to Conference.pdf",
@@ -399,11 +399,11 @@ namespace DotMailerCore.Tests
             };
         }
 
-        public static List<Attatchment> GetCampaignAttatchments()
+        public static List<Attachment> GetCampaignAttatchments()
         {
-            return new List<Attatchment>()
+            return new List<Attachment>()
             {
-                new Attatchment()
+                new Attachment()
                 {
                     Id = 2,
                     Name = "Conference schedule.pdf",
@@ -412,7 +412,7 @@ namespace DotMailerCore.Tests
                     DateCreated = DateTime.Parse("2015-11-24T11:48:38.397"),
                     DateModified = DateTime.Parse("2015-11-24T11:48:38.397")
                 },
-                new Attatchment()
+                new Attachment()
                 {
                     Id = 3,
                     Name = "Directions to Conference.pdf",

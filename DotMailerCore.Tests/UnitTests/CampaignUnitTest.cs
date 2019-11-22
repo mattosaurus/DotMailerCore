@@ -138,14 +138,14 @@ namespace DotMailerCore.Tests.UnitTests
             // Arrange
             var campaignId = TestFactory.GetCampaignId();
             var attatchment = TestFactory.GetCampaignAttatchment();
-            var mockRestResponse = TestFactory.CreateMockRestResponse<Attatchment>(Constants.CampaignAddCampaignAttatchmentContent);
-            var client = TestFactory.CreateDotMailerCoreClientWithResponse<Attatchment>(mockRestResponse.Object);
+            var mockRestResponse = TestFactory.CreateMockRestResponse<Attachment>(Constants.CampaignAddCampaignAttatchmentContent);
+            var client = TestFactory.CreateDotMailerCoreClientWithResponse<Attachment>(mockRestResponse.Object);
 
             // Act
             var response = await client.AddCampaignAttachmentAsync(campaignId, attatchment);
 
             // Assert
-            var model = Assert.IsAssignableFrom<Attatchment>(response);
+            var model = Assert.IsAssignableFrom<Attachment>(response);
         }
 
         [Fact]
@@ -166,14 +166,14 @@ namespace DotMailerCore.Tests.UnitTests
         {
             // Arrange
             var campaignId = TestFactory.GetCampaignId();
-            var mockRestResponse = TestFactory.CreateMockRestResponse<List<Attatchment>>(Constants.CampaignCampaignAttatchmentsContent);
-            var client = TestFactory.CreateDotMailerCoreClientWithResponse<List<Attatchment>>(mockRestResponse.Object);
+            var mockRestResponse = TestFactory.CreateMockRestResponse<List<Attachment>>(Constants.CampaignCampaignAttatchmentsContent);
+            var client = TestFactory.CreateDotMailerCoreClientWithResponse<List<Attachment>>(mockRestResponse.Object);
 
             // Act
             var response = await client.GetCampaignAttachmentsAsync(campaignId);
 
             // Assert
-            var model = Assert.IsAssignableFrom<List<Attatchment>>(response);
+            var model = Assert.IsAssignableFrom<List<Attachment>>(response);
         }
 
         [Fact]

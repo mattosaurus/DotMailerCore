@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DotMailerCore.Models
 {
-    public class Attatchment
+    public class Attachment
     {
         public int Id { get; set; }
 

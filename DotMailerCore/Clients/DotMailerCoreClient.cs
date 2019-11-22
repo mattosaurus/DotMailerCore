@@ -267,13 +267,13 @@ namespace DotMailerCore
         /// <param name="id"></param>
         /// <param name="attatchment"></param>
         /// <returns></returns>
-        public async Task<Attatchment> AddCampaignAttachmentAsync(int id, Attatchment attatchment)
+        public async Task<Attachment> AddCampaignAttachmentAsync(int id, Attachment attatchment)
         {
             var request = new RestRequest("/campaigns/{id}/attachments", Method.POST) { JsonSerializer = _serializer };
             request.AddParameter("id", id, ParameterType.UrlSegment);
             request.AddJsonBody(attatchment);
 
-            return await _baseClient.MakeRequestAsync<Attatchment>(request);
+            return await _baseClient.MakeRequestAsync<Attachment>(request);
         }
 
         /// <summary>
@@ -296,12 +296,12 @@ namespace DotMailerCore
         /// </summary>
         /// <param name="campaignId">The ID of the campaign, which needs to be included within the URL</param>
         /// <returns></returns>
-        public async Task<List<Attatchment>> GetCampaignAttachmentsAsync(int campaignId)
+        public async Task<List<Attachment>> GetCampaignAttachmentsAsync(int campaignId)
         {
             var request = new RestRequest("/campaigns/{campaignId}/attachments") { JsonSerializer = _serializer };
             request.AddParameter("campaignId", campaignId, ParameterType.UrlSegment);
 
-            return await _baseClient.MakeRequestAsync<List<Attatchment>>(request);
+            return await _baseClient.MakeRequestAsync<List<Attachment>>(request);
         }
 
         /// <summary>
